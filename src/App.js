@@ -1,9 +1,10 @@
 import React from "react";
+import SearchPanel from "./SearchPanel";
 
 const App = () => {
   return (
     <div>
-      <div>hi</div>
+      <SearchPanel />
     </div>
   );
 };
