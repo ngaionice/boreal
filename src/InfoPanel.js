@@ -15,17 +15,7 @@ const InfoPanel = ({ courseData }) => {
   }
 
   return (
-    <Box
-      flexDirection="column"
-      className={classes.root}
-      paddingX={5}
-      paddingY={10}
-    >
-      <Typography variant="h4">
-        {courseData.code}
-        {courseData.section} — {courseData.courseTitle}
-      </Typography>
-
+    <Box flexDirection="column" className={classes.root} paddingX={5}>
       <Typography
         variant="body1"
         dangerouslySetInnerHTML={{

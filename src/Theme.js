@@ -8,6 +8,9 @@ const theme = responsiveFontSizes(
       primary: {
         main: orange[500],
       },
+      secondary: {
+        main: "#000",
+      },
     },
     props: {
       MuiTypography: {
@@ -21,12 +24,11 @@ const theme = responsiveFontSizes(
   })
 );
 
+const drawerWidth = 320;
+
 const useStyles = makeStyles((theme) => ({
   root: {
-    "& > *": {
-      margin: theme.spacing(1),
-      width: "80vw",
-    },
+    display: "flex",
   },
   paginator: {
     justifyContent: "center",
@@ -35,8 +37,38 @@ const useStyles = makeStyles((theme) => ({
   selectionBox: {
     "& > *": {
       margin: theme.spacing(1),
-      width: "25ch",
+      width: drawerWidth,
     },
+  },
+  drawer: {
+    [theme.breakpoints.up("sm")]: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+  },
+  appBar: {
+    [theme.breakpoints.up("sm")]: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
+    },
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
+    },
+  },
+  // necessary for content to be below app bar
+  toolbar: theme.mixins.toolbar,
+  tabs: {
+    height: "48px",
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  content: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
   },
 }));
 

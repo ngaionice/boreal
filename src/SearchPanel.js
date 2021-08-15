@@ -14,7 +14,8 @@ import { Pagination } from "@material-ui/lab";
 import yearOptions from "./yearOptions";
 import { useStyles } from "./Theme";
 
-const SearchPanel = ({ setData }) => {
+const SearchPanel = (props) => {
+  const { setData } = props;
   const [term, setTerm] = useState("");
   const [year, setYear] = useState(
     yearOptions[yearOptions.length - 1]["value"]
