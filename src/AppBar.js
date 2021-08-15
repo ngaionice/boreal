@@ -14,11 +14,16 @@ function a11yProps(index) {
   };
 }
 
-const AppBar2 = ({ title, showTabs, mobileOpen, setMobileOpen }) => {
-  const [value, setValue] = React.useState(0);
-
+const AppBar2 = ({
+  title,
+  showTabs,
+  mobileOpen,
+  setMobileOpen,
+  index,
+  setIndex,
+}) => {
   const handleTabChange = (event, newValue) => {
-    setValue(newValue);
+    setIndex(newValue);
   };
 
   const handleDrawerToggle = () => {
@@ -45,7 +50,7 @@ const AppBar2 = ({ title, showTabs, mobileOpen, setMobileOpen }) => {
       </Toolbar>
       {showTabs ? (
         <Tabs
-          value={value}
+          value={index}
           onChange={handleTabChange}
           indicatorColor="secondary"
           textColor="secondary"

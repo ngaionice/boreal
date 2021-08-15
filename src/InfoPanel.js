@@ -1,21 +1,52 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Box, Typography } from "@material-ui/core";
 
 import { useStyles } from "./Theme";
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {children}
+    </div>
+  );
+}
+
+const MainPanel = ({ courseData, selectedIndex }) => {
+  return (
+    <Fragment>
+      <TabPanel value={selectedIndex} index={0}>
+        <InfoPanel courseData={courseData} />
+      </TabPanel>
+      <TabPanel value={selectedIndex} index={1}>
+        <MeetingPanel courseData={courseData} />
+      </TabPanel>
+    </Fragment>
+  );
+};
 
 const InfoPanel = ({ courseData }) => {
   const classes = useStyles();
 
   if (Object.keys(courseData).length === 0) {
     return (
-      <Typography variant="h5">
+      <Typography variant="h6">
         Search for a course for data to show up here!
       </Typography>
     );
   }
 
   return (
-    <Box flexDirection="column" className={classes.root} paddingX={5}>
+    <Box flexDirection="column" className={classes.root}>
+      <Typography variant="h4">{courseData.courseTitle}</Typography>
+
       <Typography
         variant="body1"
         dangerouslySetInnerHTML={{
@@ -53,4 +84,17 @@ const InfoPanel = ({ courseData }) => {
   );
 };
 
-export default InfoPanel;
+const MeetingPanel = ({ courseData }) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.root}>
+      <Box flexDirection="column">
+        {Object.keys(courseData.meetings).map((v) => {
+          return <div>{v}</div>;
+        })}
+      </Box>
+    </div>
+  );
+};
+
+export { MainPanel as InformationPanel };

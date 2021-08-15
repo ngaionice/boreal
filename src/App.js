@@ -1,16 +1,22 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { CssBaseline, MuiThemeProvider } from "@material-ui/core";
 import _ from "lodash";
 
 import { theme, useStyles } from "./Theme";
 import SearchPanel from "./SearchPanel";
-import InfoPanel from "./InfoPanel";
+import { InformationPanel } from "./InfoPanel";
 import { Drawer } from "./Drawer";
 import { AppBar } from "./AppBar";
 
 const App = () => {
   const [data, setData] = useState({});
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [hasData, setHasData] = useState(false);
+  const [tabIndex, setTabIndex] = React.useState(0);
+
+  useEffect(() => {
+    setHasData(!_.isEmpty(data));
+  }, [data]);
 
   const classes = useStyles();
 
@@ -22,14 +28,15 @@ const App = () => {
       <div className={classes.root}>
         <AppBar
           title={
-            !_.isEmpty(data)
-              ? `${data.code}
-                ${data.section} — ${data.courseTitle}`
-              : "Select a course to see its details."
+            hasData
+              ? `${data.code}${data.section}`
+              : "Select a course to view its details."
           }
-          showTabs={!_.isEmpty(data)}
+          showTabs={hasData}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
+          index={tabIndex}
+          setIndex={setTabIndex}
         />
         <Drawer
           children={<SearchPanel setData={setCourseData} />}
@@ -38,15 +45,16 @@ const App = () => {
         />
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          {_.isEmpty(data) ? null : (
+          {hasData ? (
             <Fragment>
               <div className={classes.tabs} />
-              <InfoPanel courseData={data} />
+              <InformationPanel courseData={data} selectedIndex={tabIndex} />
             </Fragment>
-          )}
+          ) : null}
         </main>
       </div>
     </MuiThemeProvider>
   );
 };
+
 export default App;
