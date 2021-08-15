@@ -1,31 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
+  Box,
+  Divider,
   List,
   ListItem,
   ListItemText,
-  makeStyles,
   MenuItem,
   TextField,
 } from "@material-ui/core";
+import { Pagination } from "@material-ui/lab";
 
 import yearOptions from "./yearOptions";
+import { useStyles } from "./Theme";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& > *": {
-      margin: theme.spacing(1),
-      width: "25ch",
-    },
-  },
-}));
-
-const SearchPanel = () => {
+const SearchPanel = ({ setData }) => {
   const [term, setTerm] = useState("");
   const [year, setYear] = useState(
     yearOptions[yearOptions.length - 1]["value"]
   );
   const [results, setResults] = useState({});
+
+  const itemsPerPage = 10;
+  const [page, setPage] = useState(1);
+  const [noOfPages, setNoOfPages] = useState(
+    Math.ceil(Object.keys(results).length / itemsPerPage)
+  );
+
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
 
   const classes = useStyles();
 
@@ -35,6 +39,7 @@ const SearchPanel = () => {
       const { data } = await axios.get(url, { headers: {} });
 
       setResults(data);
+      setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
     };
 
     if (term && year && !results) {
@@ -53,22 +58,23 @@ const SearchPanel = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [term, year]);
 
-  const renderedResults = Object.keys(results).map((key) => {
-    const result = results[key];
-    return (
-      <ListItem button>
-        <ListItemText
-          key={key}
-          primary={result.courseTitle}
-          secondary={`${result.code}${result.section}`}
-        />
-      </ListItem>
-    );
-  });
+  const renderedResults = Object.keys(results)
+    .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+    .map((key) => {
+      const result = results[key];
+      return (
+        <ListItem button key={key} onClick={() => setData(result)}>
+          <ListItemText
+            primary={result.courseTitle}
+            secondary={`${result.code}${result.section}`}
+          />
+        </ListItem>
+      );
+    });
 
   return (
     <div>
-      <form className={classes.root} noValidate autoComplete="off">
+      <form className={classes.selectionBox} noValidate autoComplete="off">
         <TextField
           id="year-input"
           select
@@ -91,7 +97,23 @@ const SearchPanel = () => {
           onChange={(e) => setTerm(e.target.value.toUpperCase())}
         />
       </form>
-      <List dense>{renderedResults}</List>
+      <Divider />
+      <Box padding="10px">
+        <Pagination
+          count={noOfPages}
+          page={page}
+          onChange={handleChange}
+          defaultPage={1}
+          siblingCount={0}
+          boundaryCount={1}
+          color="primary"
+          classes={{ ul: classes.paginator }}
+        />
+      </Box>
+      <Divider />
+      <Box>
+        <List dense>{renderedResults}</List>
+      </Box>
     </div>
   );
 };
