@@ -19,6 +19,8 @@ function TabPanel(props) {
   );
 }
 
+const MeetingCard = ({ courseData }) => {};
+
 const MainPanel = ({ courseData, selectedIndex }) => {
   return (
     <Fragment>
@@ -77,9 +79,33 @@ const InfoPanel = ({ courseData }) => {
         {`Breadth categories: ${courseData.breadthCategories}`}
       </Typography>
 
-      <Typography variant="body1">
+      <Typography variant="body1" paragraph>
         {`Distribution categories: ${courseData.distributionCategories}`}
       </Typography>
+
+      {courseData.webTimetableInstructions ||
+      courseData.deliveryInstructions ? (
+        <Typography variant="h5" display="block">
+          Notes:
+        </Typography>
+      ) : null}
+
+      {courseData.webTimetableInstructions ? (
+        <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: courseData.webTimetableInstructions,
+          }}
+        />
+      ) : null}
+      {courseData.deliveryInstructions ? (
+        <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: courseData.deliveryInstructions,
+          }}
+        />
+      ) : null}
     </Box>
   );
 };
@@ -90,7 +116,7 @@ const MeetingPanel = ({ courseData }) => {
     <div className={classes.root}>
       <Box flexDirection="column">
         {Object.keys(courseData.meetings).map((v) => {
-          return <div>{v}</div>;
+          return <div key={v.meetingId}>{v}</div>;
         })}
       </Box>
     </div>

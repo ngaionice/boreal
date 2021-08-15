@@ -1,15 +1,15 @@
 import { createTheme } from "@material-ui/core/styles";
-import { orange } from "@material-ui/core/colors";
 import { makeStyles, responsiveFontSizes } from "@material-ui/core";
+import { blue, grey } from "@material-ui/core/colors";
 
 const theme = responsiveFontSizes(
   createTheme({
     palette: {
       primary: {
-        main: orange[500],
+        main: blue[900],
       },
       secondary: {
-        main: "#000",
+        main: grey[50],
       },
     },
     props: {
@@ -34,10 +34,12 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     padding: "10px",
   },
-  selectionBox: {
+  searchBox: {
+    marginBottom: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     "& > *": {
-      margin: theme.spacing(1),
-      width: drawerWidth,
+      marginTop: theme.spacing(1),
     },
   },
   drawer: {
@@ -69,6 +71,9 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+  },
+  loader: {
+    margin: theme.spacing(3),
   },
 }));
 

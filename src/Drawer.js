@@ -25,7 +25,7 @@ function ResponsiveDrawer({ children, mobileOpen, setMobileOpen }) {
               paper: classes.drawerPaper,
             }}
             ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
+              keepMounted: true,
             }}
           >
             {drawer}

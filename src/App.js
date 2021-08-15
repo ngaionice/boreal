@@ -27,11 +27,7 @@ const App = () => {
       <CssBaseline />
       <div className={classes.root}>
         <AppBar
-          title={
-            hasData
-              ? `${data.code}${data.section}`
-              : "Select a course to view its details."
-          }
+          title={hasData ? `${data.code}${data.section}` : "Course Finder 2"}
           showTabs={hasData}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}

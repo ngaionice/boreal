@@ -7,7 +7,7 @@ import AppBar from "@material-ui/core/AppBar";
 import React from "react";
 import { useStyles } from "./Theme";
 
-function a11yProps(index) {
+function allyProps(index) {
   return {
     id: `simple-tab-${index}`,
     "aria-controls": `simple-tabpanel-${index}`,
@@ -44,21 +44,17 @@ const AppBar2 = ({
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap>
-          {title}
-        </Typography>
+        <Typography variant="h6">{title}</Typography>
       </Toolbar>
       {showTabs ? (
         <Tabs
           value={index}
           onChange={handleTabChange}
-          indicatorColor="secondary"
-          textColor="secondary"
           variant="fullWidth"
           aria-label="course information"
         >
-          <Tab label="Course Info" {...a11yProps(0)} />
-          <Tab label="Meeting Sections" {...a11yProps(1)} />
+          <Tab label="Course Info" {...allyProps(0)} />
+          <Tab label="Meeting Sections" {...allyProps(1)} />
         </Tabs>
       ) : null}
     </AppBar>
