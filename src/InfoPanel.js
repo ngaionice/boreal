@@ -1,7 +1,17 @@
-import React, { Fragment } from "react";
-import { Box, Typography } from "@material-ui/core";
+import React, { Fragment, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Collapse,
+  Grid,
+  Typography,
+} from "@material-ui/core";
 
 import { useStyles } from "./Theme";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import IconButton from "@material-ui/core/IconButton";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -18,6 +28,35 @@ function TabPanel(props) {
     </div>
   );
 }
+
+const InfoCard = ({ title, subtitle, children }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <Card variant="outlined">
+      <CardHeader
+        action={
+          <IconButton
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        }
+        title={<Typography variant="h6">{title}</Typography>}
+        subheader={<Typography variant="body1">{subtitle}</Typography>}
+      />
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <CardContent>{children}</CardContent>
+      </Collapse>
+    </Card>
+  );
+};
 
 const MeetingCard = ({ courseData }) => {};
 
@@ -46,67 +85,96 @@ const InfoPanel = ({ courseData }) => {
   }
 
   return (
-    <Box flexDirection="column" className={classes.root}>
-      <Typography variant="h4">{courseData.courseTitle}</Typography>
+    <Grid container className={classes.root} spacing={1}>
+      <Grid item xs={12}>
+        <Typography variant="h4">{courseData.courseTitle}</Typography>
+      </Grid>
 
-      <Typography
-        variant="body1"
-        dangerouslySetInnerHTML={{
-          __html: courseData.courseDescription,
-        }}
-      />
+      <Grid item xs={12}>
+        <Typography
+          variant="body1"
+          dangerouslySetInnerHTML={{
+            __html: courseData.courseDescription,
+          }}
+        />
+      </Grid>
 
-      <Typography variant="h5">Additional course information:</Typography>
-      {courseData.prerequisite ? (
-        <Typography variant="body1">
-          {`Pre-requisites: ${courseData.prerequisite}`}
-        </Typography>
-      ) : null}
+      <Grid item xs={12}>
+        <InfoCard
+          title="Additional course information:"
+          subtitle="Pre/co-requisites, exclusions and recommended preparation"
+        >
+          <Fragment>
+            <Typography variant="body2" paragraph>
+              {`Pre-requisites: ${
+                courseData.prerequisite ? courseData.prerequisite : "N/A"
+              }`}
+            </Typography>
 
-      {courseData.corequisite ? (
-        <Typography variant="body1">
-          {`Co-requisites: ${courseData.corequisite}`}
-        </Typography>
-      ) : null}
+            <Typography variant="body2" paragraph>
+              {`Co-requisites: ${
+                courseData.corequisite ? courseData.corequisite : "N/A"
+              }`}
+            </Typography>
 
-      {courseData.recommendedPreparation ? (
-        <Typography variant="body1">
-          {`Recommended preparation: ${courseData.recommendedPreparation}`}
-        </Typography>
-      ) : null}
+            <Typography variant="body2" paragraph>
+              {`Exclusions: ${
+                courseData.exclusion ? courseData.exclusion : "N/A"
+              }`}
+            </Typography>
 
-      <Typography variant="body1">
-        {`Breadth categories: ${courseData.breadthCategories}`}
-      </Typography>
+            <Typography variant="body2">
+              {`Recommended preparation: ${
+                courseData.recommendedPreparation
+                  ? courseData.recommendedPreparation
+                  : "N/A"
+              }`}
+            </Typography>
+          </Fragment>
+        </InfoCard>
+      </Grid>
 
-      <Typography variant="body1" paragraph>
-        {`Distribution categories: ${courseData.distributionCategories}`}
-      </Typography>
+      <Grid item xs={12}>
+        <InfoCard title={"Breadth & distribution classifications:"}>
+          <Typography variant="body2" paragraph>
+            {`Breadth categories: ${courseData.breadthCategories}`}
+          </Typography>
 
-      {courseData.webTimetableInstructions ||
-      courseData.deliveryInstructions ? (
-        <Typography variant="h5" display="block">
-          Notes:
-        </Typography>
-      ) : null}
-
+          <Typography variant="body2" paragraph>
+            {`Distribution categories: ${
+              courseData.distributionCategories
+                ? courseData.distributionCategories
+                : "N/A"
+            }`}
+          </Typography>
+        </InfoCard>
+      </Grid>
       {courseData.webTimetableInstructions ? (
-        <Typography
-          variant="body2"
-          dangerouslySetInnerHTML={{
-            __html: courseData.webTimetableInstructions,
-          }}
-        />
+        <Grid item xs={12}>
+          <InfoCard title={"Timetable instructions:"}>
+            <Typography
+              variant="body2"
+              dangerouslySetInnerHTML={{
+                __html: courseData.webTimetableInstructions,
+              }}
+            />
+          </InfoCard>
+        </Grid>
       ) : null}
+
       {courseData.deliveryInstructions ? (
-        <Typography
-          variant="body2"
-          dangerouslySetInnerHTML={{
-            __html: courseData.deliveryInstructions,
-          }}
-        />
+        <Grid item xs={12}>
+          <InfoCard title={"Delivery instructions:"}>
+            <Typography
+              variant="body2"
+              dangerouslySetInnerHTML={{
+                __html: courseData.deliveryInstructions,
+              }}
+            />
+          </InfoCard>
+        </Grid>
       ) : null}
-    </Box>
+    </Grid>
   );
 };
 
