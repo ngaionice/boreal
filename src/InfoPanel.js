@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
 import {
-  Box,
   Card,
   CardContent,
   CardHeader,
@@ -12,6 +11,7 @@ import {
 import { useStyles } from "./Theme";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import IconButton from "@material-ui/core/IconButton";
+import _ from "lodash";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -58,7 +58,52 @@ const InfoCard = ({ title, subtitle, children }) => {
   );
 };
 
-const MeetingCard = ({ courseData }) => {};
+const MeetingCard = ({ sectionCode, meetingData }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  const instructorNames = (namesObject) => {
+    if (_.isEmpty(namesObject)) return "Not available yet";
+    let string = "";
+    for (const [, value] of Object.entries(namesObject)) {
+      string += value.firstName;
+      string += ". ";
+      string += value.lastName;
+      string += ", ";
+    }
+    return string.substring(0, string.length - 2);
+  };
+
+  return (
+    <Card variant="outlined">
+      <CardHeader
+        action={
+          <IconButton
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        }
+        title={<Typography variant="h6">{sectionCode}</Typography>}
+        subheader={
+          <Typography variant="body1">{`Instructor: ${instructorNames(
+            meetingData.instructors
+          )}`}</Typography>
+        }
+      />
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <CardContent>
+          <Typography>hi</Typography>
+        </CardContent>
+      </Collapse>
+    </Card>
+  );
+};
 
 const MainPanel = ({ courseData, selectedIndex }) => {
   return (
@@ -182,11 +227,18 @@ const MeetingPanel = ({ courseData }) => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <Box flexDirection="column">
-        {Object.keys(courseData.meetings).map((v) => {
-          return <div key={v.meetingId}>{v}</div>;
+      <Grid container xs={12} spacing={1}>
+        {Object.keys(courseData.meetings).map((key) => {
+          return (
+            <Grid item xs={12}>
+              <MeetingCard
+                sectionCode={key}
+                meetingData={courseData.meetings[key]}
+              />
+            </Grid>
+          );
         })}
-      </Box>
+      </Grid>
     </div>
   );
 };
