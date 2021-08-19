@@ -1,6 +1,6 @@
 import { createTheme } from "@material-ui/core/styles";
 import { makeStyles, responsiveFontSizes } from "@material-ui/core";
-import { blue, grey } from "@material-ui/core/colors";
+import { blue, grey, red } from "@material-ui/core/colors";
 
 const theme = responsiveFontSizes(
   createTheme({
@@ -10,6 +10,9 @@ const theme = responsiveFontSizes(
       },
       secondary: {
         main: grey[50],
+      },
+      error: {
+        main: red[500],
       },
     },
     props: {
