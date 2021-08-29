@@ -25,6 +25,8 @@ const dateConverter = (date) => {
       return "Thu";
     case "FR":
       return "Fri";
+    case null:
+      return "N/A";
     default:
       return (
         date +
@@ -111,18 +113,21 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
         <Typography variant="body1">Schedule:</Typography>
         {Object.entries(schedule).map((obj) => {
           const val = obj[1];
-          const time = `${dateConverter(val.meetingDay)} 
-          ${val.meetingStartTime}-${val.meetingEndTime}`;
+          const day = dateConverter(val.meetingDay);
+          const time =
+            val.meetingStartTime !== null && val.meetingEndTime !== null
+              ? `${val.meetingStartTime}-${val.meetingEndTime}`
+              : null;
           const location = val.assignedRoom1
-            ? !val.assignedRoom2
-              ? `${val.assignedRoom1}`
-              : `${val.assignedRoom1}/${val.assignedRoom2}`
+            ? val.assignedRoom2 && val.assignedRoom1 !== val.assignedRoom2
+              ? `${val.assignedRoom1}/${val.assignedRoom2}`
+              : `${val.assignedRoom1}`
             : null;
           return (
             <Grid item xs={12}>
-              <Typography variant="body1">{`${time} @ ${
-                location != null ? location : "N/A"
-              }`}</Typography>
+              <Typography variant="body1">{`${day}${
+                time != null ? ` ${time}` : ""
+              } @ ${location != null ? location : "N/A"}`}</Typography>
             </Grid>
           );
         })}
