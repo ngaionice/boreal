@@ -89,6 +89,9 @@ const useStyles = makeStyles(
     expandOpen: {
       transform: "rotate(180deg)",
     },
+    gridItem: {
+      height: "100%",
+    },
   }),
   { index: 1 }
 );

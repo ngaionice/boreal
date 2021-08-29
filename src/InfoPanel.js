@@ -1,7 +1,6 @@
 import React, { Fragment, useState } from "react";
 import {
   Card,
-  CardActions,
   CardContent,
   CardHeader,
   Collapse,
@@ -13,7 +12,6 @@ import { useStyles } from "./Theme";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import IconButton from "@material-ui/core/IconButton";
 import _ from "lodash";
-import clsx from "clsx";
 
 const dateConverter = (date) => {
   switch (date) {
@@ -81,12 +79,7 @@ const InfoCard = ({ title, subtitle, children }) => {
 };
 
 const MeetingCard = ({ sectionCode, meetingData }) => {
-  const [expanded, setExpanded] = useState(false);
   const classes = useStyles();
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
 
   const instructorNames = (namesObject) => {
     if (_.isEmpty(namesObject)) return "Not available yet";
@@ -130,10 +123,8 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
     );
   };
 
-  const EnrollmentControls = () => {};
-
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" className={classes.gridItem}>
       <CardHeader
         title={
           <Typography variant="h6" color={spotsLeft > 0 ? "initial" : "error"}>
@@ -142,37 +133,27 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
         }
         subheader={
           <Fragment>
-            <Typography variant="body1">{`Instructor(s): ${instructorNames(
-              meetingData.instructors
-            )}`}</Typography>
             <Typography variant="body1">{capacityString}</Typography>
+            {meetingData.online !== null ? (
+              <Typography variant="body1">
+                {`Delivery mode: ${meetingData.online}`}
+              </Typography>
+            ) : null}
           </Fragment>
         }
       />
       <CardContent>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="body1">{`Instructor(s): ${instructorNames(
+              meetingData.instructors
+            )}`}</Typography>
+          </Grid>
           <Grid item xs={12}>
             <ScheduleSections schedule={meetingData.schedule} />
           </Grid>
-          {/*  try to figure out how to use collapse properly instead of relying on style */}
-          <Grid item xs={12} style={{ display: expanded ? "block" : "none" }}>
-            <Typography variant="body1">{`Delivery mode: ${meetingData.online}`}</Typography>
-          </Grid>
-          {/*    add enrollment controls*/}
         </Grid>
       </CardContent>
-      <CardActions>
-        <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded,
-          })}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </IconButton>
-      </CardActions>
     </Card>
   );
 };
@@ -299,10 +280,10 @@ const MeetingPanel = ({ courseData }) => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <Grid container spacing={1}>
+      <Grid container spacing={2}>
         {Object.keys(courseData.meetings).map((key) => {
           return (
-            <Grid item xs={12} md={6} lg={3} key={key}>
+            <Grid item xs={12} md={6} lg={3}>
               <MeetingCard
                 sectionCode={key}
                 meetingData={courseData.meetings[key]}
