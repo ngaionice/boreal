@@ -95,6 +95,24 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
     return string.substring(0, string.length - 2);
   };
 
+  const getLocation = (meetingSession) => {
+    if (!meetingSession.assignedRoom1 && !meetingSession.assignedRoom2) {
+      return null;
+    }
+    if (meetingSession.assignedRoom1 && meetingSession.assignedRoom2) {
+      if (meetingSession.assignedRoom1 === meetingSession.assignedRoom2) {
+        return meetingSession.assignedRoom1;
+      } else {
+        return (
+          meetingSession.assignedRoom1 + "/" + meetingSession.assignedRoom2
+        );
+      }
+    }
+    return meetingSession.assignedRoom1
+      ? meetingSession.assignedRoom1
+      : meetingSession.assignedRoom2;
+  };
+
   const spotsLeft =
     Number(meetingData.enrollmentCapacity) -
     Number(meetingData.actualEnrolment);
@@ -118,11 +136,7 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
             val.meetingStartTime !== null && val.meetingEndTime !== null
               ? `${val.meetingStartTime}-${val.meetingEndTime}`
               : null;
-          const location = val.assignedRoom1
-            ? val.assignedRoom2 && val.assignedRoom1 !== val.assignedRoom2
-              ? `${val.assignedRoom1}/${val.assignedRoom2}`
-              : `${val.assignedRoom1}`
-            : null;
+          const location = getLocation(val);
           return (
             <Grid item xs={12}>
               <Typography variant="body1">{`${day}${
