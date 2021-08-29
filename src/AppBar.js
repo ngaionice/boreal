@@ -1,6 +1,8 @@
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
+import Brightness3Icon from "@material-ui/icons/Brightness3";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
 import Typography from "@material-ui/core/Typography";
 import { Tab, Tabs } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
@@ -19,6 +21,8 @@ const AppBar2 = ({
   showTabs,
   mobileOpen,
   setMobileOpen,
+  dark,
+  setDark,
   index,
   setIndex,
 }) => {
@@ -44,7 +48,16 @@ const AppBar2 = ({
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h6" className={classes.flex}>
+          {title}
+        </Typography>
+        <IconButton
+          color="inherit"
+          aria-label="use dark theme"
+          onClick={() => setDark(!dark)}
+        >
+          {dark ? <Brightness3Icon /> : <Brightness7Icon />}
+        </IconButton>
       </Toolbar>
       {showTabs ? (
         <Tabs

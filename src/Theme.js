@@ -2,30 +2,33 @@ import { createTheme } from "@material-ui/core/styles";
 import { makeStyles, responsiveFontSizes } from "@material-ui/core";
 import { blue, grey, red } from "@material-ui/core/colors";
 
-const theme = responsiveFontSizes(
-  createTheme({
-    palette: {
-      primary: {
-        main: blue[900],
-      },
-      secondary: {
-        main: grey[50],
-      },
-      error: {
-        main: red[500],
-      },
-    },
-    props: {
-      MuiTypography: {
-        variantMapping: {
-          h4: "h1",
-          h5: "h2",
-          h6: "h3",
+const theme = (useDark) => {
+  return responsiveFontSizes(
+    createTheme({
+      palette: {
+        type: useDark ? "dark" : "light",
+        primary: {
+          main: blue[800],
+        },
+        secondary: {
+          main: grey[50],
+        },
+        error: {
+          main: red[500],
         },
       },
-    },
-  })
-);
+      props: {
+        MuiTypography: {
+          variantMapping: {
+            h4: "h1",
+            h5: "h2",
+            h6: "h3",
+          },
+        },
+      },
+    })
+  );
+};
 
 const drawerWidth = 320;
 
@@ -33,6 +36,9 @@ const useStyles = makeStyles(
   (theme) => ({
     root: {
       display: "flex",
+    },
+    flex: {
+      flex: 1,
     },
     paginator: {
       justifyContent: "center",

@@ -11,6 +11,7 @@ import { AppBar } from "./AppBar";
 const App = () => {
   const [data, setData] = useState({});
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [useDark, setUseDark] = React.useState(true);
   const [hasData, setHasData] = useState(false);
   const [tabIndex, setTabIndex] = React.useState(0);
 
@@ -23,7 +24,7 @@ const App = () => {
   const setCourseData = (courseData) => setData(courseData);
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme(useDark)}>
       <CssBaseline />
       <div className={classes.root}>
         <AppBar
@@ -31,6 +32,8 @@ const App = () => {
           showTabs={hasData}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
+          dark={useDark}
+          setDark={setUseDark}
           index={tabIndex}
           setIndex={setTabIndex}
         />
