@@ -35,7 +35,12 @@ const App = () => {
           setIndex={setTabIndex}
         />
         <Drawer
-          children={<SearchPanel setData={setCourseData} />}
+          children={
+            <SearchPanel
+              setData={setCourseData}
+              onCourseSelectionAction={setMobileOpen}
+            />
+          }
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
         />

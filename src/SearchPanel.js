@@ -30,7 +30,7 @@ const Loader = () => {
 };
 
 const SearchPanel = (props) => {
-  const { setData } = props;
+  const { setData, onCourseSelectionAction } = props;
 
   // search
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,6 +49,11 @@ const SearchPanel = (props) => {
 
   const handlePageChange = (event, value) => {
     setPage(value);
+  };
+
+  const onCourseClick = (result) => {
+    setData(result);
+    onCourseSelectionAction();
   };
 
   const classes = useStyles();
@@ -89,7 +94,7 @@ const SearchPanel = (props) => {
     .map((key) => {
       const result = results[key];
       return (
-        <ListItem button key={key} onClick={() => setData(result)}>
+        <ListItem button key={key} onClick={() => onCourseClick(result)}>
           <ListItemText
             primary={result.courseTitle}
             secondary={`${result.code}${result.section}`}

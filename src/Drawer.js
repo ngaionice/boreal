@@ -5,6 +5,7 @@ import { useStyles } from "./Theme";
 
 function ResponsiveDrawer({ children, mobileOpen, setMobileOpen }) {
   const classes = useStyles();
+  // figure out how to hide drawer on course selection
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);

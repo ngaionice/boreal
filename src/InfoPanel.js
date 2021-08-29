@@ -111,11 +111,18 @@ const MeetingCard = ({ sectionCode, meetingData }) => {
         <Typography variant="body1">Schedule:</Typography>
         {Object.entries(schedule).map((obj) => {
           const val = obj[1];
+          const time = `${dateConverter(val.meetingDay)} 
+          ${val.meetingStartTime}-${val.meetingEndTime}`;
+          const location = val.assignedRoom1
+            ? !val.assignedRoom2
+              ? `${val.assignedRoom1}`
+              : `${val.assignedRoom1}/${val.assignedRoom2}`
+            : null;
           return (
             <Grid item xs={12}>
-              <Typography variant="body1">{`${dateConverter(val.meetingDay)} ${
-                val.meetingStartTime
-              }-${val.meetingEndTime}`}</Typography>
+              <Typography variant="body1">{`${time} @ ${
+                location != null ? location : "N/A"
+              }`}</Typography>
             </Grid>
           );
         })}
