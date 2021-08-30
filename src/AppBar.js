@@ -1,10 +1,10 @@
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import Brightness3Icon from "@material-ui/icons/Brightness3";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import Typography from "@material-ui/core/Typography";
-import { Tab, Tabs } from "@material-ui/core";
+import { Tab, Tabs, Tooltip } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import React from "react";
 import { useStyles } from "./Theme";
@@ -51,13 +51,15 @@ const AppBar2 = ({
         <Typography variant="h6" className={classes.flex}>
           {title}
         </Typography>
-        <IconButton
-          color="inherit"
-          aria-label="use dark theme"
-          onClick={() => setDark(!dark)}
-        >
-          {dark ? <Brightness3Icon /> : <Brightness7Icon />}
-        </IconButton>
+        <Tooltip title={"Toggle light/dark theme"}>
+          <IconButton
+            color="inherit"
+            aria-label="toggle theme"
+            onClick={() => setDark(!dark)}
+          >
+            {dark ? <Brightness4Icon /> : <Brightness7Icon />}
+          </IconButton>
+        </Tooltip>
       </Toolbar>
       {showTabs ? (
         <Tabs

@@ -19,6 +19,21 @@ const App = () => {
     setHasData(!_.isEmpty(data));
   }, [data]);
 
+  useEffect(() => {
+    const existingPreference = localStorage.getItem("useDark");
+    if (existingPreference) {
+      existingPreference === "dark" ? setUseDark(true) : setUseDark(false);
+    } else {
+      setUseDark(false);
+      localStorage.setItem("useDark", "light");
+    }
+  }, []);
+
+  const setDark = (bool) => {
+    setUseDark(bool);
+    localStorage.setItem("useDark", bool ? "dark" : "light");
+  };
+
   const classes = useStyles();
 
   const setCourseData = (courseData) => setData(courseData);
@@ -33,7 +48,7 @@ const App = () => {
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
           dark={useDark}
-          setDark={setUseDark}
+          setDark={setDark}
           index={tabIndex}
           setIndex={setTabIndex}
         />
