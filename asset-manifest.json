@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/course-finder/static/js/main.040bd2bb.chunk.js",
-    "main.js.map": "/course-finder/static/js/main.040bd2bb.chunk.js.map",
+    "main.js": "/course-finder/static/js/main.c0d75b70.chunk.js",
+    "main.js.map": "/course-finder/static/js/main.c0d75b70.chunk.js.map",
     "runtime-main.js": "/course-finder/static/js/runtime-main.cc41728c.js",
     "runtime-main.js.map": "/course-finder/static/js/runtime-main.cc41728c.js.map",
     "static/js/2.000bde9a.chunk.js": "/course-finder/static/js/2.000bde9a.chunk.js",
@@ -12,6 +12,6 @@
   "entrypoints": [
     "static/js/runtime-main.cc41728c.js",
     "static/js/2.000bde9a.chunk.js",
-    "static/js/main.040bd2bb.chunk.js"
+    "static/js/main.c0d75b70.chunk.js"
   ]
 }
