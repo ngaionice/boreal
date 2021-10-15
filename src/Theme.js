@@ -1,7 +1,6 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { blue, grey, red } from "@mui/material/colors";
 
-
 const theme = (useDark) => {
   return responsiveFontSizes(
     createTheme({
@@ -40,7 +39,11 @@ const theme = (useDark) => {
             },
             h5: {
               fontFamily: "Quicksand",
-              fontWeight: 300,
+              fontWeight: 400,
+            },
+            h6: {
+              fontFamily: "Quicksand",
+              fontWeight: 400,
             },
           },
         },
@@ -50,12 +53,9 @@ const theme = (useDark) => {
 };
 
 const styles = () => {
-  const drawerWidth = 320;
+  const drawerWidth = 360;
 
   return {
-    root: {
-      display: "flex",
-    },
     flex: {
       flex: 1,
     },
@@ -87,18 +87,21 @@ const styles = () => {
     },
     contentWrapper: {
       flexGrow: 1,
-      padding: 3,
+      paddingLeft: 3,
+      paddingRight: 3,
+      paddingTop: 5,
+      paddingBottom: 5,
       marginLeft: `${drawerWidth}px`,
     },
     contentMobileWrapper: {
       flexGrow: 1,
-      padding: 3,
+      paddingLeft: 3,
+      paddingRight: 3,
+      paddingTop: 5,
+      paddingBottom: 5,
     },
     loader: {
-      margin: 3,
-    },
-    expandOpen: {
-      transform: "rotate(180deg)",
+      padding: 3,
     },
     gridItem: {
       height: "100%",

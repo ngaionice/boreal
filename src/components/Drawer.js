@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   Drawer as MuiDrawer,
   List,
   ListItem,
@@ -7,6 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  Toolbar,
 } from "@mui/material";
 
 import { Link as RouterLink } from "react-router-dom";
@@ -15,7 +17,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 
-import { styles } from "./Theme";
+import { styles } from "../theme";
 
 const sx = (drawerWidth) => ({
   mobileSx: {
@@ -34,9 +36,15 @@ const sx = (drawerWidth) => ({
   },
 });
 
-const ListEntry = ({ label, icon, right = null, to = null }) => (
+const ListEntry = ({
+  label,
+  icon,
+  right = null,
+  to = null,
+  onClick = null,
+}) => (
   <ListItem>
-    <ListItemButton component={RouterLink} to={to}>
+    <ListItemButton component={RouterLink} to={to} onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText primary={label} />
       {right}
@@ -44,19 +52,30 @@ const ListEntry = ({ label, icon, right = null, to = null }) => (
   </ListItem>
 );
 
-const DrawerContent = ({ children }) => (
+const DrawerContent = ({ children, mobileClose }) => (
   <List dense>
-    <ListSubheader id="site-functions" sx={{ backgroundColor: "transparent" }}>
-      Site functions
-    </ListSubheader>
+    <ListSubheader id="site-functions">Site functions</ListSubheader>
 
-    <ListEntry label="Favourites" icon={<FavoriteIcon />} to="/favorites" />
-    <ListEntry label="Timetable" icon={<CalendarTodayIcon />} to="/timetable" />
-    <ListEntry label="Settings" icon={<SettingsIcon />} to="/settings" />
+    <ListEntry
+      label="Favourites"
+      icon={<FavoriteIcon />}
+      to="/favorites"
+      onClick={mobileClose}
+    />
+    <ListEntry
+      label="Timetable"
+      icon={<CalendarTodayIcon />}
+      to="/timetable"
+      onClick={mobileClose}
+    />
+    <ListEntry
+      label="Settings"
+      icon={<SettingsIcon />}
+      to="/settings"
+      onClick={mobileClose}
+    />
 
-    <ListSubheader id="search" sx={{ backgroundColor: "transparent" }}>
-      Search
-    </ListSubheader>
+    <ListSubheader id="search">Search</ListSubheader>
 
     <ListItem>{children}</ListItem>
   </List>
@@ -84,7 +103,12 @@ const Drawer = ({ children, navControl, mobile }) => {
         }}
         sx={mobile ? mobileSx : permanentSx}
       >
-        <DrawerContent children={children} />
+        <Toolbar />
+        <Divider />
+        <DrawerContent
+          children={children}
+          mobileClose={mobile ? handleDrawerToggle : null}
+        />
       </MuiDrawer>
     </Box>
   );

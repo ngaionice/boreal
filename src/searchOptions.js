@@ -1,4 +1,4 @@
-const yearOptions = [
+const years = [
   {
     value: "20169",
     label: "'16 Fall - '17 Winter",
@@ -45,4 +45,4 @@ const yearOptions = [
   },
 ];
 
-export default yearOptions;
+export { years };

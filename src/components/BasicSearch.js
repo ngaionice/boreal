@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -17,7 +17,7 @@ import {
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { Link as RouterLink } from "react-router-dom";
 
-import { styles } from "./Theme";
+import { styles } from "../theme";
 import _ from "lodash";
 
 const Loader = () => {
@@ -34,7 +34,7 @@ const Loader = () => {
   );
 };
 
-const SearchOptions = ({ searchTermControl }) => {
+const SearchOptions = ({ searchTermControl, onButtonClick }) => {
   const [searchTerm, setSearchTerm] = searchTermControl;
 
   return (
@@ -57,9 +57,11 @@ const SearchOptions = ({ searchTermControl }) => {
         </Typography>
         <Button
           variant="outlined"
+          color="inherit"
           startIcon={<ManageSearchIcon />}
           component={RouterLink}
           to="/search"
+          onClick={onButtonClick}
         >
           Advanced Search
         </Button>
@@ -134,9 +136,10 @@ const Results = ({
   );
 };
 
-const SearchPanel = ({ setData, onCourseSelectionAction }) => {
+const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
   // search
   const [searchTerm, setSearchTerm] = useState("");
+  const searchInstance = useRef(0);
 
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
@@ -154,18 +157,21 @@ const SearchPanel = ({ setData, onCourseSelectionAction }) => {
   };
 
   useEffect(() => {
-    const search = async () => {
+    const search = async (currSearchInstance) => {
       const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
       const { data } = await axios.get(url, { headers: {} });
 
-      setResults(data);
-      setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
+      if (searchInstance.current === currSearchInstance) {
+        setResults(data);
+        setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
+      }
     };
 
     const execute = () => {
+      searchInstance.current += 1;
       setLoading(true);
       setPage(1);
-      search().then(() => setLoading(false));
+      search(searchInstance.current).then(() => setLoading(false));
     };
 
     if (searchTerm && !results) {
@@ -186,7 +192,10 @@ const SearchPanel = ({ setData, onCourseSelectionAction }) => {
 
   return (
     <Stack flex={1} spacing={1}>
-      <SearchOptions searchTermControl={[searchTerm, setSearchTerm]} />
+      <SearchOptions
+        searchTermControl={[searchTerm, setSearchTerm]}
+        onButtonClick={onButtonClick}
+      />
       <Results
         loading={loading}
         data={results}
@@ -199,4 +208,4 @@ const SearchPanel = ({ setData, onCourseSelectionAction }) => {
   );
 };
 
-export { SearchPanel };
+export { Search as BasicSearch };
