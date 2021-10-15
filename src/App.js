@@ -1,19 +1,26 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { CssBaseline, MuiThemeProvider } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import {
+  CssBaseline,
+  ThemeProvider,
+  StyledEngineProvider,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import _ from "lodash";
 
-import { theme, useStyles } from "./Theme";
-import SearchPanel from "./SearchPanel";
-import { InformationPanel } from "./InfoPanel";
+import { theme, styles } from "./Theme";
+import { SearchPanel } from "./SearchPanel";
 import { Drawer } from "./Drawer";
 import { AppBar } from "./AppBar";
 
 const App = () => {
+  const themeFunction = useTheme();
+
   const [data, setData] = useState({});
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [useDark, setUseDark] = React.useState(true);
+  const [expandNav, setExpandNav] = React.useState(false);
+  const [dark, setDark] = React.useState(true);
   const [hasData, setHasData] = useState(false);
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const mobile = useMediaQuery(themeFunction.breakpoints.down("md"));
 
   useEffect(() => {
     setHasData(!_.isEmpty(data));
@@ -22,57 +29,41 @@ const App = () => {
   useEffect(() => {
     const existingPreference = localStorage.getItem("useDark");
     if (existingPreference) {
-      existingPreference === "dark" ? setUseDark(true) : setUseDark(false);
+      existingPreference === "dark" ? setDark(true) : setDark(false);
     } else {
-      setUseDark(false);
+      setDark(false);
       localStorage.setItem("useDark", "light");
     }
   }, []);
 
-  const setDark = (bool) => {
-    setUseDark(bool);
-    localStorage.setItem("useDark", bool ? "dark" : "light");
-  };
+  useEffect(() => {
+    localStorage.setItem("darkMode", dark ? "dark" : "light");
+  }, [dark]);
 
-  const classes = useStyles();
+  const classes = styles();
 
   const setCourseData = (courseData) => setData(courseData);
 
   return (
-    <MuiThemeProvider theme={theme(useDark)}>
-      <CssBaseline />
-      <div className={classes.root}>
-        <AppBar
-          title={hasData ? `${data.code}${data.section}` : "Course Finder 2"}
-          showTabs={hasData}
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-          dark={useDark}
-          setDark={setDark}
-          index={tabIndex}
-          setIndex={setTabIndex}
-        />
-        <Drawer
-          children={
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme(dark)}>
+        <CssBaseline />
+        <div className={classes.root}>
+          <AppBar
+            title={hasData ? `${data.code}${data.section}` : "Boreal"}
+            navControl={[expandNav, setExpandNav]}
+            themeControl={[dark, setDark]}
+            mobile={mobile}
+          />
+          <Drawer mobile={mobile} navControl={[expandNav, setExpandNav]}>
             <SearchPanel
               setData={setCourseData}
-              onCourseSelectionAction={setMobileOpen}
+              onCourseSelectionAction={setExpandNav}
             />
-          }
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-        />
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          {hasData ? (
-            <Fragment>
-              <div className={classes.tabs} />
-              <InformationPanel courseData={data} selectedIndex={tabIndex} />
-            </Fragment>
-          ) : null}
-        </main>
-      </div>
-    </MuiThemeProvider>
+          </Drawer>
+        </div>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 };
 

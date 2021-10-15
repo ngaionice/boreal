@@ -1,12 +1,11 @@
-import { createTheme } from "@material-ui/core/styles";
-import { makeStyles, responsiveFontSizes } from "@material-ui/core";
-import { blue, grey, red } from "@material-ui/core/colors";
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
+import { blue, grey, red } from "@mui/material/colors";
 
 const theme = (useDark) => {
   return responsiveFontSizes(
     createTheme({
       palette: {
-        type: useDark ? "dark" : "light",
+        mode: useDark ? "dark" : "light",
         primary: {
           main: blue[800],
         },
@@ -17,12 +16,31 @@ const theme = (useDark) => {
           main: red[500],
         },
       },
-      props: {
+      typography: {
+        fontFamily: ["Roboto", "Quicksand"].join(","),
+      },
+      components: {
         MuiTypography: {
-          variantMapping: {
-            h4: "h1",
-            h5: "h2",
-            h6: "h3",
+          defaultProps: {
+            variantMapping: {
+              h4: "h1",
+              h5: "h2",
+              h6: "h3",
+            },
+          },
+          styleOverrides: {
+            h3: {
+              fontFamily: "Quicksand",
+              fontWeight: 300,
+            },
+            h4: {
+              fontFamily: "Quicksand",
+              fontWeight: 300,
+            },
+            h5: {
+              fontFamily: "Quicksand",
+              fontWeight: 300,
+            },
           },
         },
       },
@@ -30,10 +48,10 @@ const theme = (useDark) => {
   );
 };
 
-const drawerWidth = 320;
+const styles = () => {
+  const drawerWidth = 320;
 
-const useStyles = makeStyles(
-  (theme) => ({
+  return {
     root: {
       display: "flex",
     },
@@ -42,36 +60,20 @@ const useStyles = makeStyles(
     },
     paginator: {
       justifyContent: "center",
-      padding: "10px",
+      padding: "4px",
     },
-    searchBox: {
-      marginBottom: theme.spacing(1),
-      marginLeft: theme.spacing(1),
-      marginRight: theme.spacing(1),
-      "& > *": {
-        marginTop: theme.spacing(1),
-      },
-    },
-    drawer: {
-      [theme.breakpoints.up("md")]: {
-        width: drawerWidth,
-        flexShrink: 0,
-      },
-    },
+    drawerWidth: drawerWidth,
+    drawer: { width: { md: drawerWidth }, flexShrink: { md: 0 } },
     appBar: {
-      [theme.breakpoints.up("md")]: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: drawerWidth,
-      },
+      width: { md: `calc(100% - ${drawerWidth}px)` },
+      ml: { md: `${drawerWidth}px` },
     },
     menuButton: {
-      marginRight: theme.spacing(2),
-      [theme.breakpoints.up("md")]: {
-        display: "none",
+      marginRight: 2,
+      display: {
+        md: "none",
       },
     },
-    // necessary for content to be below app bar
-    toolbar: theme.mixins.toolbar,
     tabs: {
       height: "48px",
     },
@@ -80,17 +82,19 @@ const useStyles = makeStyles(
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3),
+      padding: 3,
+    },
+    contentWrapper: {
+      flexGrow: 1,
+      padding: 3,
+      marginLeft: `${drawerWidth}px`,
+    },
+    contentMobileWrapper: {
+      flexGrow: 1,
+      padding: 3,
     },
     loader: {
-      margin: theme.spacing(3),
-    },
-    expand: {
-      transform: "rotate(0deg)",
-      marginLeft: "auto",
-      transition: theme.transitions.create("transform", {
-        duration: theme.transitions.duration.shortest,
-      }),
+      margin: 3,
     },
     expandOpen: {
       transform: "rotate(180deg)",
@@ -98,11 +102,7 @@ const useStyles = makeStyles(
     gridItem: {
       height: "100%",
     },
-  }),
-  { index: 1 }
-);
+  };
+};
 
-// the {index: 1} is needed for production builds, as webpack messes with JSS precedence rules.
-// see https://stackoverflow.com/questions/62473898/material-ui-rendering-bugs-in-production-build
-
-export { theme, useStyles };
+export { theme, styles };

@@ -1,51 +1,93 @@
-import React from "react";
-import Drawer from "@material-ui/core/Drawer";
-import Hidden from "@material-ui/core/Hidden";
-import { useStyles } from "./Theme";
+import {
+  Box,
+  Drawer as MuiDrawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
 
-function ResponsiveDrawer({ children, mobileOpen, setMobileOpen }) {
-  const classes = useStyles();
-  // figure out how to hide drawer on course selection
+import { Link as RouterLink } from "react-router-dom";
+
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import SettingsIcon from "@mui/icons-material/Settings";
+
+import { styles } from "./Theme";
+
+const sx = (drawerWidth) => ({
+  mobileSx: {
+    display: { xs: "block", md: "none" },
+    "& .MuiDrawer-paper": {
+      boxSizing: "border-box",
+      width: drawerWidth,
+    },
+  },
+  permanentSx: {
+    display: { xs: "none", md: "block" },
+    "& .MuiDrawer-paper": {
+      boxSizing: "border-box",
+      width: drawerWidth,
+    },
+  },
+});
+
+const ListEntry = ({ label, icon, right = null, to = null }) => (
+  <ListItem>
+    <ListItemButton component={RouterLink} to={to}>
+      <ListItemIcon>{icon}</ListItemIcon>
+      <ListItemText primary={label} />
+      {right}
+    </ListItemButton>
+  </ListItem>
+);
+
+const DrawerContent = ({ children }) => (
+  <List dense>
+    <ListSubheader id="site-functions" sx={{ backgroundColor: "transparent" }}>
+      Site functions
+    </ListSubheader>
+
+    <ListEntry label="Favourites" icon={<FavoriteIcon />} to="/favorites" />
+    <ListEntry label="Timetable" icon={<CalendarTodayIcon />} to="/timetable" />
+    <ListEntry label="Settings" icon={<SettingsIcon />} to="/settings" />
+
+    <ListSubheader id="search" sx={{ backgroundColor: "transparent" }}>
+      Search
+    </ListSubheader>
+
+    <ListItem>{children}</ListItem>
+  </List>
+);
+
+const Drawer = ({ children, navControl, mobile }) => {
+  const [expandNav, setExpandNav] = navControl;
+
+  const classes = styles();
+  const drawerWidth = classes.drawerWidth;
+  const { mobileSx, permanentSx } = sx(drawerWidth);
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setExpandNav(!expandNav);
   };
 
-  const drawer = <div>{children}</div>;
-
   return (
-    <div className={classes.root}>
-      <nav className={classes.drawer} aria-label="search">
-        <Hidden mdUp implementation="css">
-          <Drawer
-            variant="temporary"
-            anchor="left"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            ModalProps={{
-              keepMounted: true,
-            }}
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-        <Hidden smDown implementation="css">
-          <Drawer
-            classes={{
-              paper: classes.drawerPaper,
-            }}
-            variant="permanent"
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Hidden>
-      </nav>
-    </div>
+    <Box sx={classes.drawer} aria-label="search">
+      <MuiDrawer
+        variant={mobile ? "temporary" : "permanent"}
+        open={mobile ? expandNav : true}
+        onClose={mobile ? handleDrawerToggle : null}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={mobile ? mobileSx : permanentSx}
+      >
+        <DrawerContent children={children} />
+      </MuiDrawer>
+    </Box>
   );
-}
+};
 
-export { ResponsiveDrawer as Drawer };
+export { Drawer };

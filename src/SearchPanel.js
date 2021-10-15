@@ -1,42 +1,143 @@
-import React, { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Box,
+  Button,
   CircularProgress,
   Divider,
   List,
   ListItem,
   ListItemText,
-  MenuItem,
+  Pagination,
+  Stack,
   TextField,
-} from "@material-ui/core";
-import { Pagination } from "@material-ui/lab";
+  Typography,
+} from "@mui/material";
 
-import yearOptions from "./yearOptions";
-import { useStyles } from "./Theme";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import { Link as RouterLink } from "react-router-dom";
+
+import { styles } from "./Theme";
+import _ from "lodash";
 
 const Loader = () => {
-  const classes = useStyles();
+  const classes = styles();
   return (
     <Box
       display="flex"
       justifyContent="center"
       alignItems="center"
-      className={classes.loader}
+      sx={classes.loader}
     >
       <CircularProgress />
     </Box>
   );
 };
 
-const SearchPanel = (props) => {
-  const { setData, onCourseSelectionAction } = props;
+const SearchOptions = ({ searchTermControl }) => {
+  const [searchTerm, setSearchTerm] = searchTermControl;
 
+  return (
+    <form noValidate autoComplete="off">
+      <Stack spacing={1}>
+        <TextField
+          id="code-input"
+          label="Course Code"
+          variant="filled"
+          placeholder="Quick search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
+          fullWidth
+          size="small"
+          flex={1}
+        />
+        <Typography variant="caption">
+          Quick search shows courses for the current year. For more options, use
+          advanced search.
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<ManageSearchIcon />}
+          component={RouterLink}
+          to="/search"
+        >
+          Advanced Search
+        </Button>
+      </Stack>
+    </form>
+  );
+};
+
+const Results = ({
+  loading,
+  data,
+  onCourseClick,
+  pageControl,
+  itemsPerPage,
+  noOfPages,
+}) => {
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (data === null || _.isEmpty(data)) {
+    return (
+      <Stack spacing={1} justifyContent="center" alignItems="center">
+        <Divider flexItem />
+        <Typography variant="body2">
+          Start searching to see courses here!
+        </Typography>
+      </Stack>
+    );
+  }
+
+  const classes = styles();
+
+  const [page, setPage] = pageControl;
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  return (
+    <Stack spacing={1}>
+      <Divider />
+
+      <Pagination
+        count={noOfPages}
+        page={page}
+        onChange={handlePageChange}
+        defaultPage={1}
+        siblingCount={0}
+        boundaryCount={1}
+        color="primary"
+        sx={{ ul: classes.paginator }}
+      />
+
+      <Divider />
+
+      <List dense>
+        {Object.keys(data)
+          .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+          .map((key) => {
+            const result = data[key];
+            return (
+              <ListItem button key={key} onClick={() => onCourseClick(result)}>
+                <ListItemText
+                  primary={result.courseTitle}
+                  secondary={`${result.code}${result.section}`}
+                />
+              </ListItem>
+            );
+          })}
+      </List>
+    </Stack>
+  );
+};
+
+const SearchPanel = ({ setData, onCourseSelectionAction }) => {
   // search
   const [searchTerm, setSearchTerm] = useState("");
-  const [year, setYear] = useState(
-    yearOptions[yearOptions.length - 1]["value"]
-  );
+
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -47,20 +148,14 @@ const SearchPanel = (props) => {
     Math.ceil(Object.keys(results).length / itemsPerPage)
   );
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
   const onCourseClick = (result) => {
     setData(result);
     onCourseSelectionAction();
   };
 
-  const classes = useStyles();
-
   useEffect(() => {
     const search = async () => {
-      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/${year}/courses?code=${searchTerm}`;
+      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
       const { data } = await axios.get(url, { headers: {} });
 
       setResults(data);
@@ -73,11 +168,11 @@ const SearchPanel = (props) => {
       search().then(() => setLoading(false));
     };
 
-    if (searchTerm && year && !results) {
+    if (searchTerm && !results) {
       execute();
     } else {
       const timerId = setTimeout(() => {
-        if (searchTerm && year) {
+        if (searchTerm) {
           execute();
         }
       }, 500);
@@ -87,75 +182,21 @@ const SearchPanel = (props) => {
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, year]);
-
-  const renderedResults = Object.keys(results)
-    .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-    .map((key) => {
-      const result = results[key];
-      return (
-        <ListItem button key={key} onClick={() => onCourseClick(result)}>
-          <ListItemText
-            primary={result.courseTitle}
-            secondary={`${result.code}${result.section}`}
-          />
-        </ListItem>
-      );
-    });
+  }, [searchTerm]);
 
   return (
-    <div>
-      <form noValidate autoComplete="off">
-        <Box className={classes.searchBox}>
-          <TextField
-            id="year-input"
-            select
-            label="Academic Year"
-            variant="filled"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            fullWidth
-          >
-            {yearOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            id="code-input"
-            label="Course Code"
-            variant="filled"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
-            fullWidth
-          />
-        </Box>
-      </form>
-      <Divider />
-      {loading ? <Loader /> : null}
-      {!loading ? (
-        <Fragment>
-          <Box padding="10px">
-            <Pagination
-              count={noOfPages}
-              page={page}
-              onChange={handlePageChange}
-              defaultPage={1}
-              siblingCount={0}
-              boundaryCount={1}
-              color="primary"
-              classes={{ ul: classes.paginator }}
-            />
-          </Box>
-          <Divider />
-          <Box>
-            <List dense>{renderedResults}</List>
-          </Box>
-        </Fragment>
-      ) : null}
-    </div>
+    <Stack flex={1} spacing={1}>
+      <SearchOptions searchTermControl={[searchTerm, setSearchTerm]} />
+      <Results
+        loading={loading}
+        data={results}
+        onCourseClick={onCourseClick}
+        pageControl={[page, setPage]}
+        noOfPages={noOfPages}
+        itemsPerPage={itemsPerPage}
+      />
+    </Stack>
   );
 };
 
-export default SearchPanel;
+export { SearchPanel };
