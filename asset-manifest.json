@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.js": "/course-finder/static/js/main.c0d75b70.chunk.js",
-    "main.js.map": "/course-finder/static/js/main.c0d75b70.chunk.js.map",
-    "runtime-main.js": "/course-finder/static/js/runtime-main.cc41728c.js",
-    "runtime-main.js.map": "/course-finder/static/js/runtime-main.cc41728c.js.map",
-    "static/js/2.000bde9a.chunk.js": "/course-finder/static/js/2.000bde9a.chunk.js",
-    "static/js/2.000bde9a.chunk.js.map": "/course-finder/static/js/2.000bde9a.chunk.js.map",
-    "index.html": "/course-finder/index.html",
-    "static/js/2.000bde9a.chunk.js.LICENSE.txt": "/course-finder/static/js/2.000bde9a.chunk.js.LICENSE.txt"
+    "main.js": "/boreal/static/js/main.eee672e7.chunk.js",
+    "main.js.map": "/boreal/static/js/main.eee672e7.chunk.js.map",
+    "runtime-main.js": "/boreal/static/js/runtime-main.4afd85df.js",
+    "runtime-main.js.map": "/boreal/static/js/runtime-main.4afd85df.js.map",
+    "static/js/2.8f001943.chunk.js": "/boreal/static/js/2.8f001943.chunk.js",
+    "static/js/2.8f001943.chunk.js.map": "/boreal/static/js/2.8f001943.chunk.js.map",
+    "index.html": "/boreal/index.html",
+    "static/js/2.8f001943.chunk.js.LICENSE.txt": "/boreal/static/js/2.8f001943.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.cc41728c.js",
-    "static/js/2.000bde9a.chunk.js",
-    "static/js/main.c0d75b70.chunk.js"
+    "static/js/runtime-main.4afd85df.js",
+    "static/js/2.8f001943.chunk.js",
+    "static/js/main.eee672e7.chunk.js"
   ]
 }
