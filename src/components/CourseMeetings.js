@@ -1,8 +1,9 @@
 import {
   Dialog,
-  DialogContent,
+  DialogContent as MuiDialogContent,
   DialogTitle,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -10,6 +11,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState } from "react";
 import _ from "lodash";
 
@@ -133,7 +135,7 @@ const MeetingListings = ({ data, onListEntryClick }) => (
   </List>
 );
 
-const DialogLayout = ({ data }) => {
+const DialogContent = ({ data }) => {
   const {
     instructors,
     meetings,
@@ -142,43 +144,62 @@ const DialogLayout = ({ data }) => {
     capacity,
     priorityGroups,
   } = data;
+  const [showGroups, setShowGroups] = useState(false);
 
   return (
-    <Stack spacing={2} divider={<Divider />}>
-      <Typography variant="body1">{`Instructors: ${instructors}`}</Typography>
-      <Typography variant="body1">{`Delivery mode: ${delivery}`}</Typography>
-      <Typography variant="body1">{capacity}</Typography>
-      <Stack>
-        <Typography variant="body1" paragraph>
-          Meetings:
-        </Typography>
-        {meetings.map((entry) => (
-          <Typography variant="body2" key={entry}>
-            {entry}
-          </Typography>
-        ))}
-      </Stack>
-      {priority ? (
+    <MuiDialogContent>
+      <Stack spacing={2} divider={<Divider />}>
+        <Typography variant="body1">{`Instructors: ${instructors}`}</Typography>
+        <Typography variant="body1">{`Delivery mode: ${delivery}`}</Typography>
+        <Typography variant="body1">{capacity}</Typography>
         <Stack>
           <Typography variant="body1" paragraph>
-            Enrollment priority:
+            Meetings:
           </Typography>
-          <Typography variant="body2">{priority}</Typography>
-        </Stack>
-      ) : null}
-      {!_.isEmpty(priorityGroups) ? (
-        <Stack>
-          <Typography variant="body1" paragraph>
-            Priority student groups:
-          </Typography>
-          {priorityGroups.map((entry, index) => (
-            <Typography variant="body2" key={index}>
+          {meetings.map((entry) => (
+            <Typography variant="body2" key={entry}>
               {entry}
             </Typography>
           ))}
         </Stack>
-      ) : null}
-    </Stack>
+        {priority ? (
+          <Stack>
+            <Typography variant="body1" paragraph>
+              Enrollment priority:
+            </Typography>
+            <Typography variant="body2">{priority}</Typography>
+          </Stack>
+        ) : null}
+        {!_.isEmpty(priorityGroups) ? (
+          <Stack>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              paddingBottom={1}
+            >
+              <Typography variant="body1">Priority student groups:</Typography>
+              <IconButton onClick={() => setShowGroups(!showGroups)}>
+                <KeyboardArrowDownIcon
+                  sx={{
+                    transform: showGroups ? "rotate(-180deg)" : "rotate(0)",
+                    transition: "0.2s",
+                  }}
+                />
+              </IconButton>
+            </Stack>
+
+            <Stack sx={{ display: showGroups ? "block" : "none" }}>
+              {priorityGroups.map((entry, index) => (
+                <Typography variant="body2" key={index}>
+                  {entry}
+                </Typography>
+              ))}
+            </Stack>
+          </Stack>
+        ) : null}
+      </Stack>
+    </MuiDialogContent>
   );
 };
 
@@ -216,9 +237,7 @@ const CourseMeetings = ({ data }) => {
         fullWidth
       >
         <DialogTitle>{dialogData.section}</DialogTitle>
-        <DialogContent>
-          <DialogLayout data={dialogData} />
-        </DialogContent>
+        <DialogContent data={dialogData} />
       </Dialog>
     </Stack>
   );

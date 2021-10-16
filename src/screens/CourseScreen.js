@@ -12,7 +12,11 @@ const Title = ({ title }) => {
   return <Typography variant="h4">{title}</Typography>;
 };
 
-const Description = ({ description }) => {
+const Description = (description) => {
+  if (!description) {
+    return null;
+  }
+
   return (
     <Typography
       variant="body1"
@@ -189,7 +193,7 @@ const CourseScreen = ({ data }) => {
     <Container maxWidth="lg">
       <Stack spacing={3} divider={<Divider />}>
         <Title title={courseTitle} />
-        <Description description={courseDescription} />
+        {Description(courseDescription)}
         {Limitations()}
         {BreadthClassifications()}
         {AdditionalInstructions()}

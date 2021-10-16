@@ -7,14 +7,25 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 import { styles } from "../theme";
+import { useState } from "react";
 
-const AppBar = ({ title, navControl, themeControl, mobile }) => {
+const AppBar = ({
+  title,
+  navControl,
+  themeControl,
+  favoriteControl,
+  mobile,
+}) => {
   const [dark, setDark] = themeControl;
   const [expandNav, setExpandNav] = navControl;
+  // let [favorite, updateFavorite] = favoriteControl;
+  // const [favorited, setFavorited] = useState(favorite);
 
   const handleDrawerToggle = () => {
     setExpandNav(!expandNav);
@@ -33,6 +44,22 @@ const AppBar = ({ title, navControl, themeControl, mobile }) => {
       </IconButton>
     </Tooltip>
   );
+
+  // const CourseControl = () => (
+  //   <Tooltip title="(Un)favorite course">
+  //     <IconButton
+  //       color="inherit"
+  //       onClick={() => {
+  //         updateFavorite();
+  //         favorite = !favorite;
+  //         console.log(favorite);
+  //         setFavorited(!favorited);
+  //       }}
+  //     >
+  //       {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+  //     </IconButton>
+  //   </Tooltip>
+  // );
 
   const DrawerControl = () => {
     if (!mobile) {
@@ -63,6 +90,7 @@ const AppBar = ({ title, navControl, themeControl, mobile }) => {
       <Toolbar>
         <DrawerControl />
         <Title />
+        {/*<CourseControl />*/}
         <BrightnessControl />
       </Toolbar>
     </MuiAppBar>

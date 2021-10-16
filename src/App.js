@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   CssBaseline,
@@ -19,34 +19,69 @@ import { CourseScreen } from "./screens/CourseScreen";
 const App = () => {
   const sv = styles();
   const themeFunction = useTheme();
-  const [dark, setDark] = React.useState(true);
+  const [dark, setDark] = React.useState(false);
 
   const [expandNav, setExpandNav] = React.useState(false);
   const mobile = useMediaQuery(themeFunction.breakpoints.down("md"));
 
   const [data, setData] = useState({});
   const [hasData, setHasData] = useState(false);
+  // const favorites = useRef([]);
+  //
+  // const getId = () => {
+  //   if (_.isEmpty(data)) {
+  //     return null;
+  //   }
+  //   return `${data.session}-${data.code}-${data.section}`;
+  // };
+  //
+  // const setFavorites = (data) => {
+  //   favorites.current = data;
+  //   localStorage.setItem("favorites", JSON.stringify(favorites));
+  //   console.log(favorites.current);
+  // };
+  //
+  // const isFavorite = (id) => _.includes(favorites.current, id);
+  //
+  // const updateFavorites = () => {
+  //   if (_.isEmpty(data)) {
+  //     return;
+  //   }
+  //   const id = `${data.session}-${data.code}-${data.section}`;
+  //   if (_.includes(favorites.current, id)) {
+  //     _.remove(favorites.current, (e) => e === id);
+  //   } else {
+  //     setFavorites([...favorites.current, id]);
+  //   }
+  //   console.log(favorites.current);
+  // };
 
   useEffect(() => {
     setHasData(!_.isEmpty(data));
   }, [data]);
 
-  // theming
+  // initial setup
   useEffect(() => {
     const existingPreference = localStorage.getItem("darkMode");
     if (existingPreference) {
       setDark(existingPreference === "dark");
     } else {
-      setDark(false);
-      localStorage.setItem("dark", "light");
+      localStorage.setItem("darkMode", "light");
     }
+
+    // const existingFavorites = localStorage.getItem("favorites");
+    // if (existingFavorites) {
+    //   setFavorites(JSON.parse(existingFavorites));
+    // }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("darkMode", dark ? "dark" : "light");
   }, [dark]);
 
-  const setCourseData = (courseData) => setData(courseData);
+  const setCourseData = (data) => {
+    setData(data);
+  };
 
   return (
     <StyledEngineProvider injectFirst>
@@ -56,6 +91,7 @@ const App = () => {
           title={hasData ? `${data.code}${data.section}` : "Boreal"}
           navControl={[expandNav, setExpandNav]}
           themeControl={[dark, setDark]}
+          // favoriteControl={[isFavorite(getId()), updateFavorites]}
           mobile={mobile}
         />
         <Drawer mobile={mobile} navControl={[expandNav, setExpandNav]}>
