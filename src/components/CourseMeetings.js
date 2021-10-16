@@ -11,13 +11,16 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import _ from "lodash";
 
 import {
   formatCapacity,
   formatDeliveryMode,
   formatInstructors,
+  formatPriorityGroup,
   formatSessionInfo,
-} from "../utilities";
+  getPriorityCodeDescription,
+} from "../utilities/courseFormatter";
 
 const MeetingListing = ({ meeting, onClick }) => {
   const {
@@ -35,7 +38,7 @@ const MeetingListing = ({ meeting, onClick }) => {
     deliveryMode, // CLASS, ONLSYNC, ONLASYNC
 
     enrollmentIndicator, // P, E, AE, PE, R1, R2
-    // enrollmentControls,
+    enrollmentControls,
 
     cancel,
   } = meeting;
@@ -44,6 +47,8 @@ const MeetingListing = ({ meeting, onClick }) => {
     if (cancel) {
       return <Typography variant="body2">Cancelled</Typography>;
     }
+
+    const full = false;
 
     return (
       <Stack
@@ -56,12 +61,13 @@ const MeetingListing = ({ meeting, onClick }) => {
             enrollmentCapacity,
             actualEnrolment,
             actualWaitlist,
-            waitlist
+            waitlist,
+            full
           )}
         </Typography>
 
         <Typography variant="body2">
-          {formatDeliveryMode(deliveryMode)}
+          {formatDeliveryMode(deliveryMode, full)}
         </Typography>
 
         <Typography variant="body2">
@@ -71,8 +77,8 @@ const MeetingListing = ({ meeting, onClick }) => {
         {Object.entries(schedule).map(([k, v]) => {
           if (k === "-") return null;
           return (
-            <Typography variant="body2">
-              {formatSessionInfo(v, false)}
+            <Typography variant="body2" key={k}>
+              {formatSessionInfo(v, full)}
             </Typography>
           );
         })}
@@ -82,13 +88,38 @@ const MeetingListing = ({ meeting, onClick }) => {
     );
   };
 
+  const section = `${teachingMethod + sectionNumber}`;
+
+  const onItemClick = () => {
+    const full = true;
+    onClick({
+      section,
+      instructors: formatInstructors(instructors),
+      meetings: Object.entries(schedule)
+        .filter(([k]) => k !== "-")
+        .map(([, v]) => formatSessionInfo(v, full)),
+      delivery: formatDeliveryMode(deliveryMode, full),
+      priority: getPriorityCodeDescription(enrollmentIndicator),
+      capacity: formatCapacity(
+        enrollmentCapacity,
+        actualEnrolment,
+        actualWaitlist,
+        waitlist,
+        full
+      ),
+      priorityGroups: enrollmentControls.map((entry) =>
+        formatPriorityGroup(entry)
+      ),
+    });
+  };
+
   return (
     <ListItem disableGutters>
-      <ListItemButton onClick={onClick}>
-        <ListItemText
-          primary={`${teachingMethod + sectionNumber}`}
-          secondary={<ListItemSecondary />}
-        />
+      <ListItemButton onClick={onItemClick}>
+        <Stack>
+          <ListItemText primary={section} />
+          <ListItemSecondary />
+        </Stack>
       </ListItemButton>
     </ListItem>
   );
@@ -96,21 +127,80 @@ const MeetingListing = ({ meeting, onClick }) => {
 
 const MeetingListings = ({ data, onListEntryClick }) => (
   <List dense>
-    {Object.entries(data).map(([, v]) => {
-      return <MeetingListing meeting={v} onClick={onListEntryClick} />;
+    {Object.entries(data).map(([k, v]) => {
+      return <MeetingListing meeting={v} onClick={onListEntryClick} key={k} />;
     })}
   </List>
 );
 
+const DialogLayout = ({ data }) => {
+  const {
+    instructors,
+    meetings,
+    delivery,
+    priority,
+    capacity,
+    priorityGroups,
+  } = data;
+
+  return (
+    <Stack spacing={2} divider={<Divider />}>
+      <Typography variant="body1">{`Instructors: ${instructors}`}</Typography>
+      <Typography variant="body1">{`Delivery mode: ${delivery}`}</Typography>
+      <Typography variant="body1">{capacity}</Typography>
+      <Stack>
+        <Typography variant="body1" paragraph>
+          Meetings:
+        </Typography>
+        {meetings.map((entry) => (
+          <Typography variant="body2" key={entry}>
+            {entry}
+          </Typography>
+        ))}
+      </Stack>
+      {priority ? (
+        <Stack>
+          <Typography variant="body1" paragraph>
+            Enrollment priority:
+          </Typography>
+          <Typography variant="body2">{priority}</Typography>
+        </Stack>
+      ) : null}
+      {!_.isEmpty(priorityGroups) ? (
+        <Stack>
+          <Typography variant="body1" paragraph>
+            Priority student groups:
+          </Typography>
+          {priorityGroups.map((entry, index) => (
+            <Typography variant="body2" key={index}>
+              {entry}
+            </Typography>
+          ))}
+        </Stack>
+      ) : null}
+    </Stack>
+  );
+};
+
 const CourseMeetings = ({ data }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState({
+    section: "",
+    instructors: "",
+    meetings: [],
+    delivery: "",
+    priority: "",
+    capacity: "",
+    priorityGroups: [],
+  });
 
   if (!data) {
     return null;
   }
 
-  const entryClick = () => {
+  const entryClick = (data) => {
     setDialogOpen(true);
+    setDialogData(data);
   };
 
   return (
@@ -125,8 +215,10 @@ const CourseMeetings = ({ data }) => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>test title</DialogTitle>
-        <DialogContent>test content</DialogContent>
+        <DialogTitle>{dialogData.section}</DialogTitle>
+        <DialogContent>
+          <DialogLayout data={dialogData} />
+        </DialogContent>
       </Dialog>
     </Stack>
   );
