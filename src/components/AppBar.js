@@ -4,6 +4,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useScrollTrigger,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -13,7 +14,19 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 import { styles } from "../theme";
-import { useEffect, useState } from "react";
+import { cloneElement, useEffect, useState } from "react";
+
+const ElevationScroll = (props) => {
+  const { children } = props;
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
+
+  return cloneElement(children, {
+    elevation: trigger ? 4 : 0,
+  });
+};
 
 const AppBar = ({
   title,
@@ -24,7 +37,7 @@ const AppBar = ({
 }) => {
   const [dark, setDark] = themeControl;
   const [expandNav, setExpandNav] = navControl;
-  const [isCurrFavorite, addToFavorites, removeFromFavorites] = favoriteControl;
+  const [isCurrFavorite, modifyFavorites] = favoriteControl;
   const [favorite, setFavorite] = useState(isCurrFavorite);
 
   useEffect(() => {
@@ -36,11 +49,7 @@ const AppBar = ({
   };
 
   const handleFavoritesToggle = () => {
-    if (!favorite) {
-      addToFavorites();
-    } else {
-      removeFromFavorites();
-    }
+    modifyFavorites(!favorite ? "add" : "remove");
   };
 
   const classes = styles();
@@ -57,13 +66,19 @@ const AppBar = ({
     </Tooltip>
   );
 
-  const CourseControl = () => (
-    <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
-      <IconButton color="inherit" onClick={handleFavoritesToggle}>
-        {favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-      </IconButton>
-    </Tooltip>
-  );
+  const CourseControl = () => {
+    if (!title) {
+      return null;
+    }
+
+    return (
+      <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
+        <IconButton color="inherit" onClick={handleFavoritesToggle}>
+          {favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        </IconButton>
+      </Tooltip>
+    );
+  };
 
   const DrawerControl = () => {
     if (!mobile) {
@@ -90,14 +105,16 @@ const AppBar = ({
   );
 
   return (
-    <MuiAppBar position="fixed" sx={classes.appBar}>
-      <Toolbar>
-        <DrawerControl />
-        <Title />
-        <CourseControl />
-        <BrightnessControl />
-      </Toolbar>
-    </MuiAppBar>
+    <ElevationScroll>
+      <MuiAppBar position="fixed" sx={classes.appBar}>
+        <Toolbar>
+          <DrawerControl />
+          <Title />
+          <CourseControl />
+          <BrightnessControl />
+        </Toolbar>
+      </MuiAppBar>
+    </ElevationScroll>
   );
 };
 

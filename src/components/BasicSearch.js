@@ -149,7 +149,6 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
   const searchInstance = useRef(0);
 
   const [results, setResults] = useState({});
-  const [resultsTimestamp, setResultsTimestamp] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // pagination
@@ -160,7 +159,10 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
   );
 
   const onCourseClick = (result) => {
-    setData(result, resultsTimestamp);
+    setData({
+      ...result,
+      updated: new Date(),
+    });
     onCourseSelectionAction();
   };
 
@@ -171,7 +173,6 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
 
       if (searchInstance.current === currSearchInstance) {
         setResults(data);
-        setResultsTimestamp(new Date());
         setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
       }
     };

@@ -15,21 +15,26 @@ const Title = () => {
 
 const FavoritesList = ({ data }) => {
   const ListEntry = ({ entry }) => {
+    const { courseTitle, code, section } = entry;
     return (
-      <ListItem>
+      <ListItem disableGutters>
         <ListItemButton>
-          <ListItemText primary={entry} />
+          <ListItemText
+            primary={`${courseTitle}`}
+            secondary={`${code}${section}`}
+          />
         </ListItemButton>
       </ListItem>
     );
   };
 
   return (
-    <List>
-      {/* figure out how to store data into favorites and make use of the last updated */}
-      {Object.entries(data).map(([k]) => (
-        <ListEntry entry={k} />
-      ))}
+    <List dense>
+      {Object.entries(data)
+        .sort((a, b) => (a < b ? -1 : 1))
+        .map(([k, v]) => (
+          <ListEntry entry={v} key={k} />
+        ))}
     </List>
   );
 };

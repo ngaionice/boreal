@@ -8,6 +8,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import _ from "lodash";
 
 import { styles, theme } from "./theme";
@@ -24,13 +25,19 @@ const App = () => {
   );
 
   const [expandNav, setExpandNav] = React.useState(false);
+  const [title, setTitle] = React.useState("");
   const mobile = useMediaQuery(themeFunction.breakpoints.down("md"));
-
-  const [data, setData] = useState({});
-  const [dataTimestamp, setDataTimestamp] = useState(null); // this may seem duplicated with Search's, but is not. if user does not click on new search results, existing data's timestamp should be the same
-  const [favorites, setFavorites] = useState({});
+  const location = useLocation();
 
   const favoritesKey = "sfoishdfoa";
+
+  const loadExistingFavorites = () => {
+    const existingFavorites = localStorage.getItem(favoritesKey);
+    return existingFavorites ? JSON.parse(existingFavorites) : {};
+  };
+
+  const [data, setData] = useState({});
+  const [favorites, setFavorites] = useState(loadExistingFavorites());
 
   // initial setup
   useEffect(() => {
@@ -53,14 +60,38 @@ const App = () => {
     };
   }, []);
 
+  // location updates
+  useEffect(() => {
+    let newTitle;
+    switch (location.pathname) {
+      case "/favorites":
+        newTitle = "Favorites";
+        break;
+      case "/timetable":
+        newTitle = "Timetable";
+        break;
+      case "/settings":
+        newTitle = "Settings";
+        break;
+      case "/course":
+        newTitle = !_.isEmpty(data) ? `${data.code}${data.section}` : "Course";
+        break;
+      default:
+        newTitle = "Boreal";
+    }
+    if (location.pathname.startsWith("/course")) {
+      setTitle(newTitle);
+    } else {
+      setTitle("");
+    }
+    document.title = newTitle;
+  }, [location, data]);
+
   useEffect(() => {
     localStorage.setItem("darkMode", dark ? "dark" : "light");
   }, [dark]);
 
-  const setCourseData = (data, timestamp) => {
-    setData(data);
-    setDataTimestamp(timestamp);
-  };
+  const setCourseData = (data) => setData(data);
 
   const getId = () => {
     if (_.isEmpty(data)) {
@@ -69,26 +100,25 @@ const App = () => {
     return `${data.session}-${data.code}-${data.section}`;
   };
 
-  const addFavorite = () => {
-    const courseId = getId();
-    if (!courseId) return;
+  const updateFavorite = (action) => {
+    if (_.isEmpty(data)) return;
 
+    const courseId = `${data.session}-${data.code}-${data.section}`;
+    let updated;
     setFavorites((state) => {
-      const updated = {
-        ...state,
-        [courseId]: dataTimestamp,
-      };
-      localStorage.setItem(favoritesKey, JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const deleteFavorite = () => {
-    const courseId = getId();
-    if (!courseId) return;
-
-    setFavorites((state) => {
-      const updated = _.omit(state, courseId);
+      switch (action) {
+        case "add":
+          updated = {
+            ...state,
+            [courseId]: data,
+          };
+          break;
+        case "remove":
+          updated = _.omit(state, courseId);
+          break;
+        default:
+          return state;
+      }
       localStorage.setItem(favoritesKey, JSON.stringify(updated));
       return updated;
     });
@@ -99,13 +129,12 @@ const App = () => {
       <ThemeProvider theme={theme(dark)}>
         <CssBaseline />
         <AppBar
-          title={!_.isEmpty(data) ? `${data.code}${data.section}` : "Boreal"}
+          title={title}
           navControl={[expandNav, setExpandNav]}
           themeControl={[dark, setDark]}
           favoriteControl={[
             Object.keys(favorites).includes(getId()),
-            addFavorite,
-            deleteFavorite,
+            updateFavorite,
           ]}
           mobile={mobile}
         />
