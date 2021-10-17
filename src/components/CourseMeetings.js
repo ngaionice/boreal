@@ -10,6 +10,8 @@ import {
   ListItemText,
   Stack,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState } from "react";
@@ -46,11 +48,37 @@ const MeetingListing = ({ meeting, onClick }) => {
   } = meeting;
 
   const ListItemSecondary = () => {
+    const theme = useTheme();
+    const fontVariant = useMediaQuery(theme.breakpoints.down("sm"))
+      ? "caption"
+      : "body2";
+
     if (cancel) {
-      return <Typography variant="body2">Cancelled</Typography>;
+      return <Typography variant={fontVariant}>Cancelled</Typography>;
     }
 
     const full = false;
+    const Instructors = (instructors) => {
+      if (useMediaQuery(theme.breakpoints.down("sm"))) {
+        return null;
+      }
+
+      return (
+        <Typography variant={fontVariant} display={{ xs: "none", sm: "block" }}>
+          {formatInstructors(instructors)}
+        </Typography>
+      );
+    };
+
+    const EnrollmentIndicator = (enrollmentIndicator) => {
+      if (useMediaQuery(theme.breakpoints.down("sm")) || !enrollmentIndicator) {
+        return null;
+      }
+
+      return (
+        <Typography variant={fontVariant}>{enrollmentIndicator}</Typography>
+      );
+    };
 
     return (
       <Stack
@@ -58,7 +86,7 @@ const MeetingListing = ({ meeting, onClick }) => {
         direction="row"
         divider={<Divider orientation="vertical" flexItem />}
       >
-        <Typography variant="body2">
+        <Typography variant={fontVariant}>
           {formatCapacity(
             enrollmentCapacity,
             actualEnrolment,
@@ -68,24 +96,22 @@ const MeetingListing = ({ meeting, onClick }) => {
           )}
         </Typography>
 
-        <Typography variant="body2">
+        <Typography variant={fontVariant}>
           {formatDeliveryMode(deliveryMode, full)}
         </Typography>
 
-        <Typography variant="body2">
-          {formatInstructors(instructors)}
-        </Typography>
+        {Instructors(instructors)}
 
         {Object.entries(schedule).map(([k, v]) => {
           if (k === "-") return null;
           return (
-            <Typography variant="body2" key={k}>
+            <Typography variant={fontVariant} key={k}>
               {formatSessionInfo(v, full)}
             </Typography>
           );
         })}
 
-        <Typography variant="body2">{enrollmentIndicator}</Typography>
+        {EnrollmentIndicator(enrollmentIndicator)}
       </Stack>
     );
   };
