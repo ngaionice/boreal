@@ -13,7 +13,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 import { styles } from "../theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const AppBar = ({
   title,
@@ -24,11 +24,24 @@ const AppBar = ({
 }) => {
   const [dark, setDark] = themeControl;
   const [expandNav, setExpandNav] = navControl;
-  // let [favorite, updateFavorite] = favoriteControl;
-  // const [favorited, setFavorited] = useState(favorite);
+  const [isCurrFavorite, addToFavorites, removeFromFavorites] = favoriteControl;
+  const [favorite, setFavorite] = useState(isCurrFavorite);
+
+  useEffect(() => {
+    setFavorite(isCurrFavorite);
+  }, [title, isCurrFavorite]);
 
   const handleDrawerToggle = () => {
     setExpandNav(!expandNav);
+  };
+
+  const handleFavoritesToggle = () => {
+    if (!favorite) {
+      addToFavorites();
+    } else {
+      removeFromFavorites();
+    }
+    setFavorite(!favorite);
   };
 
   const classes = styles();
@@ -45,21 +58,13 @@ const AppBar = ({
     </Tooltip>
   );
 
-  // const CourseControl = () => (
-  //   <Tooltip title="(Un)favorite course">
-  //     <IconButton
-  //       color="inherit"
-  //       onClick={() => {
-  //         updateFavorite();
-  //         favorite = !favorite;
-  //         console.log(favorite);
-  //         setFavorited(!favorited);
-  //       }}
-  //     >
-  //       {favorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-  //     </IconButton>
-  //   </Tooltip>
-  // );
+  const CourseControl = () => (
+    <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
+      <IconButton color="inherit" onClick={handleFavoritesToggle}>
+        {favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+      </IconButton>
+    </Tooltip>
+  );
 
   const DrawerControl = () => {
     if (!mobile) {
@@ -90,7 +95,7 @@ const AppBar = ({
       <Toolbar>
         <DrawerControl />
         <Title />
-        {/*<CourseControl />*/}
+        <CourseControl />
         <BrightnessControl />
       </Toolbar>
     </MuiAppBar>

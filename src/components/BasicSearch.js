@@ -122,8 +122,15 @@ const Results = ({
           .slice((page - 1) * itemsPerPage, page * itemsPerPage)
           .map((key) => {
             const result = data[key];
+            // TODO: set the 'to' here to a more specific path? might want to update the page title as well for better browser history
             return (
-              <ListItem button key={key} onClick={() => onCourseClick(result)}>
+              <ListItem
+                button
+                key={key}
+                onClick={() => onCourseClick(result)}
+                component={RouterLink}
+                to={"/course"}
+              >
                 <ListItemText
                   primary={result.courseTitle}
                   secondary={`${result.code}${result.section}`}
@@ -142,6 +149,7 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
   const searchInstance = useRef(0);
 
   const [results, setResults] = useState({});
+  const [resultsTimestamp, setResultsTimestamp] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // pagination
@@ -152,7 +160,7 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
   );
 
   const onCourseClick = (result) => {
-    setData(result);
+    setData(result, resultsTimestamp);
     onCourseSelectionAction();
   };
 
@@ -163,6 +171,7 @@ const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
 
       if (searchInstance.current === currSearchInstance) {
         setResults(data);
+        setResultsTimestamp(new Date());
         setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
       }
     };
