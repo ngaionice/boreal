@@ -41,7 +41,6 @@ const AppBar = ({
     } else {
       removeFromFavorites();
     }
-    setFavorite(!favorite);
   };
 
   const classes = styles();
