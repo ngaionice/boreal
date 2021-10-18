@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
-  Box,
   Button,
-  CircularProgress,
   Divider,
   List,
   ListItem,
@@ -16,21 +14,84 @@ import {
 
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { Link as RouterLink } from "react-router-dom";
-
-import { styles } from "../theme";
 import _ from "lodash";
 
-const Loader = () => {
-  const classes = styles();
+import { styles } from "../theme";
+import { Loader } from "./Loader";
+
+const Search = ({ fetchedDataControl, onCourseSelection, onButtonClick }) => {
+  // search
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchInstance = useRef(0);
+
+  const [fetchedData, setFetchedData] = fetchedDataControl;
+  const [loading, setLoading] = useState(false);
+  const retrievedOn = useRef(new Date());
+
+  // pagination
+  const itemsPerPage = 10;
+  const [page, setPage] = useState(1);
+  const [noOfPages, setNoOfPages] = useState(
+    Math.ceil(Object.keys(fetchedData).length / itemsPerPage)
+  );
+
+  const onCourseClick = () => {
+    onCourseSelection();
+  };
+
+  useEffect(() => {
+    const search = async (currSearchInstance) => {
+      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
+      retrievedOn.current = new Date();
+      const { data } = await axios.get(url, { headers: {} });
+
+      if (searchInstance.current === currSearchInstance) {
+        Object.keys(data).forEach((key) => {
+          data[key]["updated"] = retrievedOn.current;
+        });
+        setFetchedData(data);
+        setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
+      }
+    };
+
+    const execute = () => {
+      searchInstance.current += 1;
+      setLoading(true);
+      setPage(1);
+      search(searchInstance.current).then(() => setLoading(false));
+    };
+
+    if (searchTerm && !fetchedData) {
+      execute();
+    } else {
+      const timerId = setTimeout(() => {
+        if (searchTerm) {
+          execute();
+        }
+      }, 500);
+
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
+
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={classes.loader}
-    >
-      <CircularProgress />
-    </Box>
+    <Stack flex={1} spacing={1}>
+      <SearchOptions
+        searchTermControl={[searchTerm, setSearchTerm]}
+        onButtonClick={onButtonClick}
+      />
+      <Results
+        loading={loading}
+        data={fetchedData}
+        onCourseClick={onCourseClick}
+        pageControl={[page, setPage]}
+        noOfPages={noOfPages}
+        itemsPerPage={itemsPerPage}
+      />
+    </Stack>
   );
 };
 
@@ -122,18 +183,18 @@ const Results = ({
           .slice((page - 1) * itemsPerPage, page * itemsPerPage)
           .map((key) => {
             const result = data[key];
-            // TODO: set the 'to' here to a more specific path? might want to update the page title as well for better browser history
+            const { courseTitle, code, section, session } = result;
             return (
               <ListItem
                 button
                 key={key}
                 onClick={() => onCourseClick(result)}
                 component={RouterLink}
-                to={"/course"}
+                to={`/course/${session}/${section.toLowerCase()}/${code.toLowerCase()}`}
               >
                 <ListItemText
-                  primary={result.courseTitle}
-                  secondary={`${result.code}${result.section}`}
+                  primary={courseTitle}
+                  secondary={`${code}${section}`}
                 />
               </ListItem>
             );
@@ -143,79 +204,4 @@ const Results = ({
   );
 };
 
-const Search = ({ setData, onCourseSelectionAction, onButtonClick }) => {
-  // search
-  const [searchTerm, setSearchTerm] = useState("");
-  const searchInstance = useRef(0);
-
-  const [results, setResults] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  // pagination
-  const itemsPerPage = 10;
-  const [page, setPage] = useState(1);
-  const [noOfPages, setNoOfPages] = useState(
-    Math.ceil(Object.keys(results).length / itemsPerPage)
-  );
-
-  const onCourseClick = (result) => {
-    setData({
-      ...result,
-      updated: new Date(),
-    });
-    onCourseSelectionAction();
-  };
-
-  useEffect(() => {
-    const search = async (currSearchInstance) => {
-      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
-      const { data } = await axios.get(url, { headers: {} });
-
-      if (searchInstance.current === currSearchInstance) {
-        setResults(data);
-        setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
-      }
-    };
-
-    const execute = () => {
-      searchInstance.current += 1;
-      setLoading(true);
-      setPage(1);
-      search(searchInstance.current).then(() => setLoading(false));
-    };
-
-    if (searchTerm && !results) {
-      execute();
-    } else {
-      const timerId = setTimeout(() => {
-        if (searchTerm) {
-          execute();
-        }
-      }, 500);
-
-      return () => {
-        clearTimeout(timerId);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
-
-  return (
-    <Stack flex={1} spacing={1}>
-      <SearchOptions
-        searchTermControl={[searchTerm, setSearchTerm]}
-        onButtonClick={onButtonClick}
-      />
-      <Results
-        loading={loading}
-        data={results}
-        onCourseClick={onCourseClick}
-        pageControl={[page, setPage]}
-        noOfPages={noOfPages}
-        itemsPerPage={itemsPerPage}
-      />
-    </Stack>
-  );
-};
-
-export { Search as BasicSearch };
+export { Search as QuickSearchPanel };

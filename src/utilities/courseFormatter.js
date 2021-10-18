@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-const formatDate = (date, full) => {
+const formatDayOfWeek = (date, full) => {
   switch (date) {
     case "MO":
       return full ? "Mon" : "M";
@@ -54,7 +54,7 @@ const formatSessionInfo = (meetingSession, full) => {
     assignedRoom2,
   } = meetingSession;
 
-  const date = formatDate(meetingDay, full);
+  const date = formatDayOfWeek(meetingDay, full);
 
   const time = full
     ? meetingStartTime + " – " + meetingEndTime
@@ -143,7 +143,16 @@ const getPriorityCodeDescription = (code) => {
   }
 };
 
+const formatDate = (date) => {
+  if (!date) {
+    return null;
+  }
+  const sections = date.toString().split(" ");
+  return `${sections[1]} ${sections[2]} ${sections[3]} ${sections[4]} ${sections[6]} ${sections[7]} ${sections[8]}`;
+};
+
 export {
+  formatDate,
   formatDeliveryMode,
   formatInstructors,
   formatCapacity,

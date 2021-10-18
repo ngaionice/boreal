@@ -2,15 +2,26 @@ import { Route, Switch } from "react-router-dom";
 import { CourseScreen } from "./screens/CourseScreen";
 import { FavoritesScreen } from "./screens/FavoritesScreen";
 
-const Switchboard = ({ favorites, currCourseData }) => {
+const Switchboard = ({
+  favorites,
+  currFetchedData,
+  currDisplayedDataControl,
+}) => {
+  const [setCurrDisplayedData] = currDisplayedDataControl;
   return (
     <Switch>
       <Route path="/course">
-        <CourseScreen data={currCourseData} />
+        <CourseScreen
+          currDisplayedDataControl={currDisplayedDataControl}
+          currFetchedData={currFetchedData}
+        />
       </Route>
 
       <Route path="/favorites">
-        <FavoritesScreen favorites={favorites} />
+        <FavoritesScreen
+          favorites={favorites}
+          setCurrData={setCurrDisplayedData}
+        />
       </Route>
     </Switch>
   );

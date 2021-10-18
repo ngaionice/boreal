@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   CssBaseline,
@@ -12,39 +12,55 @@ import { useLocation } from "react-router-dom";
 import _ from "lodash";
 
 import { styles, theme } from "./theme";
-import { BasicSearch } from "./components/BasicSearch";
+import { QuickSearchPanel } from "./components/QuickSearchPanel";
 import { Drawer } from "./components/Drawer";
 import { AppBar } from "./components/AppBar";
 import { Switchboard } from "./Switchboard";
 
+const getTitle = (pathname, courseData) => {
+  if (pathname === "/search") {
+    return "Search";
+  } else if (pathname === "/favorites") {
+    return "Favorites";
+  } else if (pathname === "/timetable") {
+    return "Timetable";
+  } else if (pathname === "/settings") {
+    return "Settings";
+  } else if (pathname.startsWith("/course")) {
+    return !_.isEmpty(courseData)
+      ? `${courseData.code}${courseData.section}`
+      : "";
+  } else {
+    return "Boreal";
+  }
+};
+
 const App = () => {
   const sv = styles();
   const themeFunction = useTheme();
-  const [dark, setDark] = React.useState(
-    localStorage.getItem("darkMode") === "dark"
-  );
-
-  const [expandNav, setExpandNav] = React.useState(false);
-  const [title, setTitle] = React.useState("");
   const mobile = useMediaQuery(themeFunction.breakpoints.down("md"));
   const location = useLocation();
 
-  const favoritesKey = "sfoishdfoa";
+  const [dark, setDark] = useState(localStorage.getItem("darkMode") === "dark");
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [appBarTitle, setAppBarTitle] = useState("");
+
+  const favoritesKey = "dfsoudfhsud"; // to be fixed eventually when finalized
 
   const loadExistingFavorites = () => {
     const existingFavorites = localStorage.getItem(favoritesKey);
     return existingFavorites ? JSON.parse(existingFavorites) : {};
   };
 
-  const [data, setData] = useState({});
+  const [currFetchedData, setCurrFetchedData] = useState({});
   const [favorites, setFavorites] = useState(loadExistingFavorites());
+
+  const [currDisplayedData, setCurrDisplayedData] = useState({});
 
   // initial setup
   useEffect(() => {
     const existingFavorites = localStorage.getItem(favoritesKey);
-    if (existingFavorites) {
-      setFavorites(JSON.parse(existingFavorites));
-    }
+    if (existingFavorites) setFavorites(JSON.parse(existingFavorites));
 
     const monitorCrossTabState = (e) => {
       if (e.key === "darkMode") {
@@ -62,66 +78,42 @@ const App = () => {
 
   // location updates
   useEffect(() => {
-    let newTitle;
-    switch (location.pathname) {
-      case "/favorites":
-        newTitle = "Favorites";
-        break;
-      case "/timetable":
-        newTitle = "Timetable";
-        break;
-      case "/settings":
-        newTitle = "Settings";
-        break;
-      case "/course":
-        newTitle = !_.isEmpty(data) ? `${data.code}${data.section}` : "Course";
-        break;
-      default:
-        newTitle = "Boreal";
-    }
-    if (location.pathname.startsWith("/course")) {
-      setTitle(newTitle);
-    } else {
-      setTitle("");
-    }
-    document.title = newTitle;
-  }, [location, data]);
+    const { pathname } = location;
+    const newTitle = getTitle(pathname, currDisplayedData);
+
+    setAppBarTitle(location.pathname.startsWith("/course") ? newTitle : "");
+    document.title = `Boreal${newTitle === "Boreal" ? "" : " — " + newTitle}`;
+  }, [location, currDisplayedData]);
 
   useEffect(() => {
     localStorage.setItem("darkMode", dark ? "dark" : "light");
   }, [dark]);
 
-  const setCourseData = (data) => setData(data);
-
   const getId = () => {
-    if (_.isEmpty(data)) {
-      return null;
-    }
-    return `${data.session}-${data.code}-${data.section}`;
+    if (_.isEmpty(currDisplayedData)) return null;
+    return `${currDisplayedData.code}-${currDisplayedData.section}-${currDisplayedData.session}`;
   };
 
   const updateFavorite = (action) => {
-    if (_.isEmpty(data)) return;
+    const courseId = getId();
+    if (!courseId) return;
 
-    const courseId = `${data.session}-${data.code}-${data.section}`;
-    let updated;
     setFavorites((state) => {
-      switch (action) {
-        case "add":
-          updated = {
-            ...state,
-            [courseId]: data,
-          };
-          break;
-        case "remove":
-          updated = _.omit(state, courseId);
-          break;
-        default:
-          return state;
-      }
+      if (action !== "add" && action !== "remove") return state;
+      const updated =
+        action === "remove"
+          ? _.omit(state, courseId)
+          : {
+              ...state,
+              [courseId]: currDisplayedData,
+            };
       localStorage.setItem(favoritesKey, JSON.stringify(updated));
       return updated;
     });
+  };
+
+  const onQuickPanelCourseSelection = () => {
+    setIsNavExpanded(false);
   };
 
   return (
@@ -129,8 +121,8 @@ const App = () => {
       <ThemeProvider theme={theme(dark)}>
         <CssBaseline />
         <AppBar
-          title={title}
-          navControl={[expandNav, setExpandNav]}
+          title={appBarTitle}
+          navControl={[isNavExpanded, setIsNavExpanded]}
           themeControl={[dark, setDark]}
           favoriteControl={[
             Object.keys(favorites).includes(getId()),
@@ -138,20 +130,24 @@ const App = () => {
           ]}
           mobile={mobile}
         />
-        <Drawer mobile={mobile} navControl={[expandNav, setExpandNav]}>
-          <BasicSearch
-            setData={setCourseData}
-            onCourseSelectionAction={setExpandNav}
-            onButtonClick={() => setExpandNav(!expandNav)}
+        <Drawer mobile={mobile} navControl={[isNavExpanded, setIsNavExpanded]}>
+          <QuickSearchPanel
+            fetchedDataControl={[currFetchedData, setCurrFetchedData]}
+            onCourseSelection={onQuickPanelCourseSelection}
+            onButtonClick={() => setIsNavExpanded(!isNavExpanded)}
           />
         </Drawer>
         <Toolbar />
         <Box sx={mobile ? sv.contentMobileWrapper : sv.contentWrapper}>
-          <Switchboard favorites={favorites} currCourseData={data} />
+          <Switchboard
+            favorites={favorites}
+            currFetchedData={currFetchedData}
+            currDisplayedDataControl={[currDisplayedData, setCurrDisplayedData]}
+          />
         </Box>
       </ThemeProvider>
     </StyledEngineProvider>
   );
 };
 
-export default App;
+export { App };
