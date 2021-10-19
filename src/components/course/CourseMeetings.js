@@ -24,7 +24,7 @@ import {
   formatPriorityGroup,
   formatSessionInfo,
   getPriorityCodeDescription,
-} from "../utilities/courseFormatter";
+} from "../../utilities/courseFormatter";
 
 const MeetingListing = ({ meeting, onClick }) => {
   const {

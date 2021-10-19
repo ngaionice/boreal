@@ -1,13 +1,10 @@
 import axios from "axios";
 
-const instance = (searchParams) => {
-  const { session } = searchParams;
+const instance = () => {
   return axios.create({
-    baseURL: `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/${session}/courses/`,
+    baseURL:
+      "https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/",
     headers: {},
-    params: {
-      ...searchParams,
-    },
   });
 };
 

@@ -7,11 +7,12 @@ import {
   useScrollTrigger,
 } from "@mui/material";
 
-import MenuIcon from "@mui/icons-material/Menu";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MenuIcon from "@mui/icons-material/Menu";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 import { styles } from "../theme";
 import { cloneElement, useEffect, useState } from "react";
@@ -54,7 +55,7 @@ const AppBar = ({
 
   const classes = styles();
 
-  const BrightnessControl = () => (
+  const BrightnessButton = () => (
     <Tooltip title={"Toggle theme"}>
       <IconButton
         color="inherit"
@@ -66,10 +67,8 @@ const AppBar = ({
     </Tooltip>
   );
 
-  const CourseControl = () => {
-    if (!title) {
-      return null;
-    }
+  const FavoritesButton = () => {
+    if (!title) return null;
 
     return (
       <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
@@ -80,10 +79,21 @@ const AppBar = ({
     );
   };
 
-  const DrawerControl = () => {
-    if (!mobile) {
-      return null;
-    }
+  const RefreshButton = () => {
+    if (!title) return null;
+
+    // TODO: pass in function to be called
+    return (
+      <Tooltip title="Refresh course">
+        <IconButton color="inherit">
+          <RefreshIcon />
+        </IconButton>
+      </Tooltip>
+    );
+  };
+
+  const DrawerButton = () => {
+    if (!mobile) return null;
 
     return (
       <IconButton
@@ -108,10 +118,11 @@ const AppBar = ({
     <ElevationScroll>
       <MuiAppBar position="fixed" sx={classes.appBar}>
         <Toolbar>
-          <DrawerControl />
+          <DrawerButton />
           <Title />
-          <CourseControl />
-          <BrightnessControl />
+          {/*<RefreshButton />*/}
+          <FavoritesButton />
+          <BrightnessButton />
         </Toolbar>
       </MuiAppBar>
     </ElevationScroll>

@@ -1,13 +1,16 @@
 import {
   Container,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
+  ListItemSecondaryAction,
   ListItemText,
   Stack,
   Typography,
 } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import { Link as RouterLink } from "react-router-dom";
 
@@ -15,14 +18,14 @@ const Title = () => {
   return <Typography variant="h4">Saved Courses</Typography>;
 };
 
-const FavoritesList = ({ favorites, setCurrData }) => {
+const FavoritesList = ({ favoritesControl }) => {
+  const [favorites, updateFavorite] = favoritesControl;
   const ListEntry = ({ entry }) => {
     const { courseTitle, code, section, session } = entry;
     return (
       <ListItem disableGutters>
         <ListItemButton
           component={RouterLink}
-          onClick={() => setCurrData(entry)}
           to={`/course/${session}/${section.toLowerCase()}/${code.toLowerCase()}`}
         >
           <ListItemText
@@ -30,6 +33,15 @@ const FavoritesList = ({ favorites, setCurrData }) => {
             secondary={`${code}${section}`}
           />
         </ListItemButton>
+        <ListItemSecondaryAction>
+          <IconButton
+            onClick={() =>
+              updateFavorite("remove", `${code}-${section}-${session}`)
+            }
+          >
+            <ClearIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
       </ListItem>
     );
   };
@@ -45,12 +57,12 @@ const FavoritesList = ({ favorites, setCurrData }) => {
   );
 };
 
-const FavoritesScreen = ({ favorites, setCurrData }) => {
+const FavoritesScreen = ({ favoritesControl }) => {
   return (
     <Container maxWidth="lg">
       <Stack spacing={3} divider={<Divider />}>
         <Title />
-        <FavoritesList favorites={favorites} setCurrData={setCurrData} />
+        <FavoritesList favoritesControl={favoritesControl} />
       </Stack>
     </Container>
   );

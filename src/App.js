@@ -16,24 +16,7 @@ import { QuickSearchPanel } from "./components/QuickSearchPanel";
 import { Drawer } from "./components/Drawer";
 import { AppBar } from "./components/AppBar";
 import { Switchboard } from "./Switchboard";
-
-const getTitle = (pathname, courseData) => {
-  if (pathname === "/search") {
-    return "Search";
-  } else if (pathname === "/favorites") {
-    return "Favorites";
-  } else if (pathname === "/timetable") {
-    return "Timetable";
-  } else if (pathname === "/settings") {
-    return "Settings";
-  } else if (pathname.startsWith("/course")) {
-    return !_.isEmpty(courseData)
-      ? `${courseData.code}${courseData.section}`
-      : "";
-  } else {
-    return "Boreal";
-  }
-};
+import { getPageTitle } from "./utilities/misc";
 
 const App = () => {
   const sv = styles();
@@ -45,7 +28,7 @@ const App = () => {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [appBarTitle, setAppBarTitle] = useState("");
 
-  const favoritesKey = "dfsoudfhsud"; // to be fixed eventually when finalized
+  const favoritesKey = "dfsoudfhsud"; // to be fixed eventually when stable
 
   const loadExistingFavorites = () => {
     const existingFavorites = localStorage.getItem(favoritesKey);
@@ -79,7 +62,7 @@ const App = () => {
   // location updates
   useEffect(() => {
     const { pathname } = location;
-    const newTitle = getTitle(pathname, currDisplayedData);
+    const newTitle = getPageTitle(pathname, currDisplayedData);
 
     setAppBarTitle(location.pathname.startsWith("/course") ? newTitle : "");
     document.title = `Boreal${newTitle === "Boreal" ? "" : " — " + newTitle}`;
@@ -94,8 +77,7 @@ const App = () => {
     return `${currDisplayedData.code}-${currDisplayedData.section}-${currDisplayedData.session}`;
   };
 
-  const updateFavorite = (action) => {
-    const courseId = getId();
+  const updateFavorite = (action, courseId = getId()) => {
     if (!courseId) return;
 
     setFavorites((state) => {
@@ -140,7 +122,7 @@ const App = () => {
         <Toolbar />
         <Box sx={mobile ? sv.contentMobileWrapper : sv.contentWrapper}>
           <Switchboard
-            favorites={favorites}
+            favoritesControl={[favorites, updateFavorite]}
             currFetchedData={currFetchedData}
             currDisplayedDataControl={[currDisplayedData, setCurrDisplayedData]}
           />
