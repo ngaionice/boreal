@@ -151,6 +151,57 @@ const formatDate = (date) => {
   return `${sections[1]} ${sections[2]} ${sections[3]} ${sections[4]} ${sections[6]} ${sections[7]} ${sections[8]}`;
 };
 
+const getYearLabel = (session, section) => {
+  const year = session.substring(2, 4);
+  const season = session.substring(4);
+  section = section.toLowerCase();
+
+  let seasonLabel;
+  if (season === "9") {
+    seasonLabel =
+      section === "f" ? "Fall" : section === "s" ? "Winter" : "Full-year";
+  } else {
+    seasonLabel =
+      "Summer " +
+      (section === "f"
+        ? "first sub-session"
+        : section === "s"
+        ? "second sub-session"
+        : "full-session");
+  }
+
+  return `'${year} ${seasonLabel}`;
+};
+
+const extractInstructorsAndOccupancy = (meetings) => {
+  const lectures = Object.entries(meetings).filter(
+    ([, v]) => v["teachingMethod"] === "LEC"
+  );
+
+  const instructorsSet = new Set();
+  const instructors = [];
+  let ratio = 0;
+  lectures.forEach(([, v]) => {
+    Object.entries(v["instructors"]).forEach(([, instructor]) => {
+      const name = `${instructor["firstName"]}. ${instructor["lastName"]}`;
+      if (!instructorsSet.has(name)) {
+        instructors.push(name);
+        instructorsSet.add(name);
+      }
+    });
+    if (!v["cancel"]) {
+      ratio += Number(v["actualEnrolment"]) / Number(v["enrollmentCapacity"]);
+    }
+  });
+
+  return [
+    instructors
+      .sort((a, b) => (a.split(" ")[1] > b.split(" ")[1] ? 1 : -1))
+      .join(", "),
+    lectures.length !== 0 ? ratio / lectures.length : 0,
+  ];
+};
+
 export {
   formatDate,
   formatDeliveryMode,
@@ -159,4 +210,6 @@ export {
   formatPriorityGroup,
   formatSessionInfo,
   getPriorityCodeDescription,
+  getYearLabel,
+  extractInstructorsAndOccupancy,
 };

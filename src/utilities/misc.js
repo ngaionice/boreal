@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import { years } from "./searchOptions";
 
-const getPageTitle = (pathname, currDisplayedCourse) => {
+const getPageTitle = (pathname, currDisplayedCourse, mobile) => {
   if (pathname === "/search") {
     return "Search";
   } else if (pathname === "/favorites") {
@@ -17,10 +17,9 @@ const getPageTitle = (pathname, currDisplayedCourse) => {
       const session = years.filter(
         (obj) => obj.value === currDisplayedCourse.session
       );
-      console.log(session);
-      return `${currDisplayedCourse.code}${
-        currDisplayedCourse.section
-      } (Session: ${
+      return `${currDisplayedCourse.code}${currDisplayedCourse.section} (${
+        !mobile ? "Session: " : ""
+      }${
         !_.isEmpty(session)
           ? session[0].short_label
           : currDisplayedCourse.session

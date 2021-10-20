@@ -1,4 +1,13 @@
-import { Box, Container, Divider, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Divider,
+  Grid,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -13,6 +22,7 @@ import { CourseMeetings as Meetings } from "../components/course/CourseMeetings"
 import { formatDate } from "../utilities/courseFormatter";
 import { getSearchInstance } from "../utilities/fetcher";
 import { Loader } from "../components/Loader";
+import { PastOfferings } from "../components/course/PastOfferings";
 
 const CourseScreen = ({
   currDisplayedDataControl,
@@ -22,6 +32,9 @@ const CourseScreen = ({
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [currDisplayedData, setCurrDisplayedData] = currDisplayedDataControl;
+
+  const themeFunction = useTheme();
+  const hidePastOfferings = useMediaQuery(themeFunction.breakpoints.down("lg"));
 
   // summary: try to load from current data, if not then
   // 1) if offline: try to load from favs
@@ -77,7 +90,6 @@ const CourseScreen = ({
           setLoading(false);
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   if (loading) {
@@ -97,6 +109,9 @@ const CourseScreen = ({
   }
 
   const {
+    code,
+    section,
+    session,
     courseTitle,
     courseDescription,
     prerequisite,
@@ -112,24 +127,41 @@ const CourseScreen = ({
   } = currDisplayedData;
 
   return (
-    <Container maxWidth="lg">
-      <Stack spacing={3} divider={<Divider />}>
-        <Title title={courseTitle} retrievedOn={formatDate(updated)} />
-        {Description({ courseDescription })}
-        {Limitations({
-          prerequisite,
-          corequisite,
-          exclusion,
-          recommendedPreparation,
-        })}
-        {BreadthClassifications({ breadthCategories, distributionCategories })}
-        {AdditionalInstructions({
-          webTimetableInstructions,
-          deliveryInstructions,
-        })}
-        <Meetings data={meetings} />
-      </Stack>
-    </Container>
+    <Grid container>
+      <Grid item xs={12} lg={9}>
+        <Container maxWidth="lg">
+          <Stack spacing={3} divider={<Divider />}>
+            <Title title={courseTitle} retrievedOn={formatDate(updated)} />
+            {Description({ description: courseDescription })}
+            {Limitations({
+              prerequisite,
+              corequisite,
+              exclusion,
+              recommendedPreparation,
+            })}
+            {BreadthClassifications({
+              breadthCategories,
+              distributionCategories,
+            })}
+            {AdditionalInstructions({
+              webTimetableInstructions,
+              deliveryInstructions,
+            })}
+            <Meetings data={meetings} />
+          </Stack>
+        </Container>
+      </Grid>
+
+      {hidePastOfferings ? null : (
+        <Grid item xs={12} lg={3}>
+          <PastOfferings
+            courseCode={code}
+            currSection={section}
+            currSession={session}
+          />
+        </Grid>
+      )}
+    </Grid>
   );
 };
 

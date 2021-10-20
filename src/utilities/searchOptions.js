@@ -56,6 +56,26 @@ const years = [
   },
 ];
 
+const sessions = [
+  "20169",
+  "20175",
+  "20179",
+  "20185",
+  "20189",
+  "20195",
+  "20199",
+  "20205",
+  "20209",
+  "20215",
+  "20219",
+];
+
+const instances = sessions.flatMap((v) => [
+  { session: v, section: "f" },
+  { session: v, section: "s" },
+  { session: v, section: "y" },
+]);
+
 const deptCodes = (
   "ABP/ACT/AFR/AMS/ANA/ANT/APM/ARC/ARH/AST/BCB/BCH/" +
   "BIO/BMS/BPM/CAR/CAS/CDN/CHC/CHM/CIN/CJH/CJS/CLA/" +
@@ -75,4 +95,4 @@ const deptCodes = (
   "WDW/WGS/WRR"
 ).split("/");
 
-export { years, deptCodes };
+export { years, deptCodes, instances };

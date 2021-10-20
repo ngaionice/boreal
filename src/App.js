@@ -42,6 +42,8 @@ const App = () => {
 
   // initial setup
   useEffect(() => {
+    // cache();
+
     const existingFavorites = localStorage.getItem(favoritesKey);
     if (existingFavorites) setFavorites(JSON.parse(existingFavorites));
 
@@ -62,11 +64,11 @@ const App = () => {
   // location updates
   useEffect(() => {
     const { pathname } = location;
-    const newTitle = getPageTitle(pathname, currDisplayedData);
+    const newTitle = getPageTitle(pathname, currDisplayedData, mobile);
 
     setAppBarTitle(location.pathname.startsWith("/course") ? newTitle : "");
     document.title = `Boreal${newTitle === "Boreal" ? "" : " — " + newTitle}`;
-  }, [location, currDisplayedData]);
+  }, [location, currDisplayedData, mobile]);
 
   useEffect(() => {
     localStorage.setItem("darkMode", dark ? "dark" : "light");
