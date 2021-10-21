@@ -8,8 +8,9 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import _ from "lodash";
 
 import {
   Title,
@@ -32,9 +33,12 @@ const CourseScreen = ({
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [currDisplayedData, setCurrDisplayedData] = currDisplayedDataControl;
+  const online = useRef(true);
 
   const themeFunction = useTheme();
-  const hidePastOfferings = useMediaQuery(themeFunction.breakpoints.down("lg"));
+  const pastOfferingsOnSide = useMediaQuery(
+    themeFunction.breakpoints.down("lg")
+  );
 
   // summary: try to load from current data, if not then
   // 1) if offline: try to load from favs
@@ -63,10 +67,13 @@ const CourseScreen = ({
     } else {
       setLoading(true);
       if (!window.navigator.onLine) {
+        online.current = false;
         if (favorites.hasOwnProperty(currDisplayedId)) {
           setCurrDisplayedData(favorites[currDisplayedId]);
-          setLoading(false);
+        } else {
+          setCurrDisplayedData({});
         }
+        setLoading(false);
         return;
       }
       const retrievedOn = new Date();
@@ -90,10 +97,19 @@ const CourseScreen = ({
           setLoading(false);
         });
     }
+    // eslint-disable-next-line
   }, [location]);
 
   if (loading) {
     return <Loader />;
+  }
+
+  if (!online.current && _.isEmpty(currDisplayedData)) {
+    return (
+      <Typography>
+        You are currently offline. Please try again later.
+      </Typography>
+    );
   }
 
   if (Object.keys(currDisplayedData).length === 0) {
@@ -148,17 +164,28 @@ const CourseScreen = ({
               deliveryInstructions,
             })}
             <Meetings data={meetings} />
+            {pastOfferingsOnSide ? (
+              <PastOfferings
+                courseCode={code}
+                currSection={section}
+                currSession={session}
+                mobile={true}
+              />
+            ) : null}
           </Stack>
         </Container>
       </Grid>
 
-      {hidePastOfferings ? null : (
+      {pastOfferingsOnSide ? null : (
         <Grid item xs={12} lg={3}>
-          <PastOfferings
-            courseCode={code}
-            currSection={section}
-            currSession={session}
-          />
+          <Container maxWidth="sm">
+            <PastOfferings
+              courseCode={code}
+              currSection={section}
+              currSession={session}
+              mobile={false}
+            />
+          </Container>
         </Grid>
       )}
     </Grid>

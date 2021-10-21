@@ -1,5 +1,4 @@
 import {
-  Container,
   Divider,
   List,
   ListItem,
@@ -19,7 +18,7 @@ import {
 } from "../../utilities/courseFormatter";
 import { Loader } from "../Loader";
 
-const PastOfferings = ({ courseCode, currSection, currSession }) => {
+const PastOfferings = ({ courseCode, currSection, currSession, mobile }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({});
   const mounted = useRef(true);
@@ -46,29 +45,45 @@ const PastOfferings = ({ courseCode, currSection, currSession }) => {
     };
   }, [courseCode, currSession, currSection]);
 
+  return (
+    <Stack divider={mobile ? null : <Divider />} spacing={mobile ? 0 : 2}>
+      <Typography variant="h5" paragraph={mobile}>
+        Past offerings
+      </Typography>
+      <Content data={data} loading={loading} mobile={mobile} />
+    </Stack>
+  );
+};
+
+const Content = ({ data, loading, mobile }) => {
+  if (!window.navigator.onLine) {
+    return (
+      <Typography variant="body2">
+        Past offerings data is not available when offline.
+      </Typography>
+    );
+  }
+
   if (loading) {
     return <Loader />;
   }
 
+  if (!data || _.isEmpty(data)) {
+    return (
+      <Typography variant="body2">
+        This course code has no past offerings.
+      </Typography>
+    );
+  }
+
   return (
-    <Container maxWidth="sm">
-      <Stack divider={<Divider />} spacing={2}>
-        <Typography variant="h5">Past offerings</Typography>
-        {!data || _.isEmpty(data) ? (
-          <Typography variant="body2">
-            This course code has no past offerings.
-          </Typography>
-        ) : (
-          <List>
-            {Object.entries(data)
-              .reverse()
-              .map(([k, v]) => (
-                <Listing data={v} key={k} />
-              ))}
-          </List>
-        )}
-      </Stack>
-    </Container>
+    <List dense={!mobile}>
+      {Object.entries(data)
+        .reverse()
+        .map(([k, v]) => (
+          <Listing data={v} key={k} />
+        ))}
+    </List>
   );
 };
 

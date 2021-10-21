@@ -152,25 +152,33 @@ const formatDate = (date) => {
 };
 
 const getYearLabel = (session, section) => {
-  const year = session.substring(2, 4);
-  const season = session.substring(4);
+  const seasonLabel = session.substring(4);
   section = section.toLowerCase();
 
-  let seasonLabel;
-  if (season === "9") {
-    seasonLabel =
-      section === "f" ? "Fall" : section === "s" ? "Winter" : "Full-year";
+  const year =
+    (seasonLabel === "9" && section === "f") || seasonLabel === "5"
+      ? session.substring(2, 4)
+      : Number(session.substring(2, 4)) + 1;
+  let season;
+  if (seasonLabel === "9") {
+    if (section === "f") {
+      season = "Fall";
+    } else if (section === "s") {
+      season = "Winter";
+    } else {
+      season = "Year-long";
+    }
   } else {
-    seasonLabel =
-      "Summer " +
-      (section === "f"
-        ? "first sub-session"
+    season = "Summer ";
+    season +=
+      section === "f"
+        ? "(1st half)"
         : section === "s"
-        ? "second sub-session"
-        : "full-session");
+        ? "(2nd half)"
+        : "(full session)";
   }
 
-  return `'${year} ${seasonLabel}`;
+  return `'${year} ${season}`;
 };
 
 const extractInstructorsAndOccupancy = (meetings) => {

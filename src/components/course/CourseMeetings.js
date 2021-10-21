@@ -253,7 +253,7 @@ const CourseMeetings = ({ data }) => {
   return (
     <Stack>
       <Typography variant="h5" paragraph>
-        Meeting Sections
+        Meeting sections
       </Typography>
       <MeetingListings data={data} onListEntryClick={entryClick} />
       <Dialog
