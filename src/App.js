@@ -28,30 +28,35 @@ const App = () => {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const [appBarTitle, setAppBarTitle] = useState("");
 
-  const favoritesKey = "dfsoudfhsud"; // to be fixed eventually when stable
+  const [currDisplayedData, setCurrDisplayedData] = useState({});
+  const [currFetchedData, setCurrFetchedData] = useState({});
+
+  // to be fixed eventually when stable
+  const favoritesKey = "dfsoudfhsud";
+  const timetablesKey = "asfoahfisd";
 
   const loadExistingFavorites = () => {
     const existingFavorites = localStorage.getItem(favoritesKey);
     return existingFavorites ? JSON.parse(existingFavorites) : {};
   };
 
-  const [currFetchedData, setCurrFetchedData] = useState({});
-  const [favorites, setFavorites] = useState(loadExistingFavorites());
+  const loadExistingTimetables = () => {
+    const existingTimetables = localStorage.getItem(timetablesKey);
+    return existingTimetables ? JSON.parse(existingTimetables) : {};
+  };
 
-  const [currDisplayedData, setCurrDisplayedData] = useState({});
+  const [favorites, setFavorites] = useState(loadExistingFavorites());
+  const [timetables, setTimetables] = useState(loadExistingTimetables());
 
   // initial setup
   useEffect(() => {
-    // cache();
-
-    const existingFavorites = localStorage.getItem(favoritesKey);
-    if (existingFavorites) setFavorites(JSON.parse(existingFavorites));
-
     const monitorCrossTabState = (e) => {
       if (e.key === "darkMode") {
         setDark(e.newValue === "dark");
       } else if (e.key === favoritesKey) {
         setFavorites(JSON.parse(e.newValue));
+      } else if (e.key === timetablesKey) {
+        setTimetables(JSON.parse(e.newValue));
       }
     };
 
@@ -96,6 +101,27 @@ const App = () => {
     });
   };
 
+  const updateTimetables = (action, { session, code, section, meeting }) => {
+    const { teachingMethod, sectionNumber, schedule } = meeting;
+    // get keys of timetables, check if session exists
+    // if does not exist
+    // - & action = add,
+    // -- create session (key = session, value = new object),
+    // -- then create new kv pair (k = code+section, v = new object)
+    // -- then inside this new object, add new kv pair: (k = teachingMethod, v = meeting)
+    // - & action = remove,
+    // -- return
+    // if exists
+    // - & action = add,
+    // -- check if code+section exists,
+    // --- if exists, upsert: (k = teachingMethod, v = meeting)
+    // --- if does not exist, then create (k = code+section, v = new object), then insert (k = teachingMethod, v = meeting)
+    // - & action = remove,
+    // -- check if code+section exists,
+    // --- if exists, delete kv pair (k = teachingMethod)
+    // --- if does not exist, return
+  };
+
   const onQuickPanelCourseSelection = () => {
     setIsNavExpanded(false);
   };
@@ -125,6 +151,7 @@ const App = () => {
         <Box sx={mobile ? sv.contentMobileWrapper : sv.contentWrapper}>
           <Switchboard
             favoritesControl={[favorites, updateFavorite]}
+            timetablesControl={[timetables, updateTimetables]}
             currFetchedData={currFetchedData}
             currDisplayedDataControl={[currDisplayedData, setCurrDisplayedData]}
           />

@@ -229,7 +229,7 @@ const DialogContent = ({ data }) => {
   );
 };
 
-const CourseMeetings = ({ data }) => {
+const CourseMeetings = ({ data, timetablesControl }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState({
     section: "",

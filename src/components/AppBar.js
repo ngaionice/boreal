@@ -7,10 +7,10 @@ import {
   useScrollTrigger,
 } from "@mui/material";
 
+import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
+import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import MenuIcon from "@mui/icons-material/Menu";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
@@ -73,7 +73,7 @@ const AppBar = ({
     return (
       <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
         <IconButton color="inherit" onClick={handleFavoritesToggle}>
-          {favorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+          {favorite ? <BookmarkRemoveIcon /> : <BookmarkAddIcon />}
         </IconButton>
       </Tooltip>
     );

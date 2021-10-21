@@ -1,4 +1,5 @@
 import {
+  Box,
   Container,
   Divider,
   IconButton,
@@ -15,11 +16,24 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { Link as RouterLink } from "react-router-dom";
 
 const Title = () => {
-  return <Typography variant="h4">Saved Courses</Typography>;
+  return <Typography variant="h4">Bookmarked Courses</Typography>;
 };
 
 const FavoritesList = ({ favoritesControl }) => {
   const [favorites, updateFavorite] = favoritesControl;
+
+  if (Object.keys(favorites).length < 1) {
+    return (
+      <Box display="flex" justifyContent="center">
+        <Typography variant="body2">
+          You don't have any bookmarked courses yet. To bookmark a course, click
+          the add bookmark button on the top-right corner when you're at a
+          course page.
+        </Typography>
+      </Box>
+    );
+  }
+
   const ListEntry = ({ entry }) => {
     const { courseTitle, code, section, session } = entry;
     return (

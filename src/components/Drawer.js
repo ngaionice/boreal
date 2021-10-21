@@ -13,8 +13,8 @@ import {
 
 import { Link as RouterLink } from "react-router-dom";
 
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import { styles } from "../theme";
@@ -57,9 +57,9 @@ const DrawerContent = ({ children, mobileClose }) => (
     <ListSubheader id="site-functions">Site functions</ListSubheader>
 
     <ListEntry
-      label="Favourites"
-      icon={<FavoriteIcon />}
-      to="/favorites"
+      label="Bookmarks"
+      icon={<BookmarkIcon />}
+      to="/bookmarks"
       onClick={mobileClose}
     />
     <ListEntry
