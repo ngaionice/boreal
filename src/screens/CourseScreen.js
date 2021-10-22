@@ -29,7 +29,7 @@ const CourseScreen = ({
   currDisplayedDataControl,
   currFetchedData,
   favorites,
-  timetablesControl,
+  timetableControl,
 }) => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -164,7 +164,13 @@ const CourseScreen = ({
               webTimetableInstructions,
               deliveryInstructions,
             })}
-            <Meetings data={meetings} timetablesControl={timetablesControl} />
+            <Meetings
+              data={meetings}
+              timetableControl={timetableControl}
+              section={section}
+              session={session}
+              code={code}
+            />
             {pastOfferingsOnSide ? (
               <PastOfferings
                 courseCode={code}

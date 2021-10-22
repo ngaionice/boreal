@@ -1,7 +1,15 @@
-import { Container, Typography } from "@mui/material";
+import { Container, Select, Typography } from "@mui/material";
+import { useState } from "react";
+import _ from "lodash";
 
-const TimetableScreen = ({ timetablesControl }) => {
-  const { timetables, updateTimetables } = timetablesControl;
+const TimetableScreen = ({ timetableControl }) => {
+  const [timetable, updateTimetable] = timetableControl;
+  const [currSession, setCurrSession] = useState(
+    _.last(Object.keys(timetable))
+  );
+  console.log(timetable);
+
+  const sections = Object.keys(timetable);
 
   return (
     <Container maxWidth="lg">

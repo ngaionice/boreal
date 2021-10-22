@@ -7,7 +7,7 @@ const Switchboard = ({
   favoritesControl,
   currFetchedData,
   currDisplayedDataControl,
-  timetablesControl,
+  timetableControl,
 }) => {
   const [favorites] = favoritesControl;
   return (
@@ -17,6 +17,7 @@ const Switchboard = ({
           currDisplayedDataControl={currDisplayedDataControl}
           currFetchedData={currFetchedData}
           favorites={favorites}
+          timetableControl={timetableControl}
         />
       </Route>
 
@@ -25,7 +26,7 @@ const Switchboard = ({
       </Route>
 
       <Route path="/timetable">
-        <TimetableScreen timetablesControl={timetablesControl} />
+        <TimetableScreen timetableControl={timetableControl} />
       </Route>
     </Switch>
   );

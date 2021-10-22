@@ -7,12 +7,16 @@ import {
   List,
   ListItem,
   ListItemButton,
+  ListItemSecondaryAction,
   ListItemText,
   Stack,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useState } from "react";
 import _ from "lodash";
@@ -26,7 +30,14 @@ import {
   getPriorityCodeDescription,
 } from "../../utilities/courseFormatter";
 
-const MeetingListing = ({ meeting, onClick }) => {
+const MeetingListing = ({
+  meeting,
+  onClick,
+  timetableControl,
+  session,
+  section,
+  code,
+}) => {
   const {
     schedule,
     instructors,
@@ -46,6 +57,7 @@ const MeetingListing = ({ meeting, onClick }) => {
 
     cancel,
   } = meeting;
+  const [timetable, updateTimetable] = timetableControl;
 
   const ListItemSecondary = () => {
     const theme = useTheme();
@@ -116,12 +128,12 @@ const MeetingListing = ({ meeting, onClick }) => {
     );
   };
 
-  const section = `${teachingMethod + sectionNumber}`;
+  const lectureSection = `${teachingMethod + sectionNumber}`;
 
-  const onItemClick = () => {
+  const getDataForDialog = () => {
     const full = true;
-    onClick({
-      section,
+    return {
+      section: lectureSection,
       instructors: formatInstructors(instructors),
       meetings: Object.entries(schedule)
         .filter(([k]) => k !== "-")
@@ -138,25 +150,83 @@ const MeetingListing = ({ meeting, onClick }) => {
       priorityGroups: enrollmentControls.map((entry) =>
         formatPriorityGroup(entry)
       ),
-    });
+    };
+  };
+
+  const onItemClick = () => {
+    onClick(getDataForDialog());
+  };
+
+  section = section.toUpperCase();
+  code = code.toUpperCase();
+
+  const isEntryInTimetable = () => {
+    if (
+      !Object.keys(timetable).includes(session) ||
+      !Object.keys(timetable[session]).includes(`${code}${section}`) ||
+      !Object.keys(timetable[session][`${code}${section}`]).includes(
+        teachingMethod
+      )
+    ) {
+      return false;
+    }
+    return (
+      timetable[session][`${code}${section}`][teachingMethod][
+        "sectionNumber"
+      ] === sectionNumber
+    );
   };
 
   return (
     <ListItem disableGutters>
       <ListItemButton onClick={onItemClick}>
         <Stack>
-          <ListItemText primary={section} />
+          <ListItemText primary={lectureSection} />
           <ListItemSecondary />
         </Stack>
       </ListItemButton>
+      <ListItemSecondaryAction>
+        {isEntryInTimetable() ? (
+          <IconButton disabled>
+            <EventAvailableIcon />
+          </IconButton>
+        ) : (
+          <Tooltip title="Add to timetable" placement="left">
+            <IconButton
+              onClick={() =>
+                updateTimetable("add", { session, code, section, meeting })
+              }
+            >
+              <EventAvailableIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </ListItemSecondaryAction>
     </ListItem>
   );
 };
 
-const MeetingListings = ({ data, onListEntryClick }) => (
+const MeetingListings = ({
+  data,
+  onListEntryClick,
+  timetableControl,
+  section,
+  session,
+  code,
+}) => (
   <List dense>
     {Object.entries(data).map(([k, v]) => {
-      return <MeetingListing meeting={v} onClick={onListEntryClick} key={k} />;
+      return (
+        <MeetingListing
+          meeting={v}
+          onClick={onListEntryClick}
+          key={k}
+          timetableControl={timetableControl}
+          section={section}
+          session={session}
+          code={code}
+        />
+      );
     })}
   </List>
 );
@@ -229,7 +299,7 @@ const DialogContent = ({ data }) => {
   );
 };
 
-const CourseMeetings = ({ data, timetablesControl }) => {
+const CourseMeetings = ({ data, timetableControl, section, session, code }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState({
     section: "",
@@ -255,7 +325,14 @@ const CourseMeetings = ({ data, timetablesControl }) => {
       <Typography variant="h5" paragraph>
         Meeting sections
       </Typography>
-      <MeetingListings data={data} onListEntryClick={entryClick} />
+      <MeetingListings
+        data={data}
+        onListEntryClick={entryClick}
+        timetableControl={timetableControl}
+        section={section}
+        session={session}
+        code={code}
+      />
       <Dialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

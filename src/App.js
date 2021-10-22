@@ -18,6 +18,16 @@ import { AppBar } from "./components/AppBar";
 import { Switchboard } from "./Switchboard";
 import { getPageTitle } from "./utilities/misc";
 
+const loadExistingFavorites = (favoritesKey) => {
+  const existingFavorites = localStorage.getItem(favoritesKey);
+  return existingFavorites ? JSON.parse(existingFavorites) : {};
+};
+
+const loadExistingTimetable = (timetablesKey) => {
+  const existingTimetables = localStorage.getItem(timetablesKey);
+  return existingTimetables ? JSON.parse(existingTimetables) : {};
+};
+
 const App = () => {
   const sv = styles();
   const themeFunction = useTheme();
@@ -35,18 +45,12 @@ const App = () => {
   const favoritesKey = "dfsoudfhsud";
   const timetablesKey = "asfoahfisd";
 
-  const loadExistingFavorites = () => {
-    const existingFavorites = localStorage.getItem(favoritesKey);
-    return existingFavorites ? JSON.parse(existingFavorites) : {};
-  };
-
-  const loadExistingTimetables = () => {
-    const existingTimetables = localStorage.getItem(timetablesKey);
-    return existingTimetables ? JSON.parse(existingTimetables) : {};
-  };
-
-  const [favorites, setFavorites] = useState(loadExistingFavorites());
-  const [timetables, setTimetables] = useState(loadExistingTimetables());
+  const [favorites, setFavorites] = useState(
+    loadExistingFavorites(favoritesKey)
+  );
+  const [timetable, setTimetable] = useState(
+    loadExistingTimetable(timetablesKey)
+  );
 
   // initial setup
   useEffect(() => {
@@ -56,7 +60,7 @@ const App = () => {
       } else if (e.key === favoritesKey) {
         setFavorites(JSON.parse(e.newValue));
       } else if (e.key === timetablesKey) {
-        setTimetables(JSON.parse(e.newValue));
+        setTimetable(JSON.parse(e.newValue));
       }
     };
 
@@ -101,25 +105,35 @@ const App = () => {
     });
   };
 
-  const updateTimetables = (action, { session, code, section, meeting }) => {
-    const { teachingMethod, sectionNumber, schedule } = meeting;
-    // get keys of timetables, check if session exists
-    // if does not exist
-    // - & action = add,
-    // -- create session (key = session, value = new object),
-    // -- then create new kv pair (k = code+section, v = new object)
-    // -- then inside this new object, add new kv pair: (k = teachingMethod, v = meeting)
-    // - & action = remove,
-    // -- return
-    // if exists
-    // - & action = add,
-    // -- check if code+section exists,
-    // --- if exists, upsert: (k = teachingMethod, v = meeting)
-    // --- if does not exist, then create (k = code+section, v = new object), then insert (k = teachingMethod, v = meeting)
-    // - & action = remove,
-    // -- check if code+section exists,
-    // --- if exists, delete kv pair (k = teachingMethod)
-    // --- if does not exist, return
+  const updateTimetable = (action, { session, code, section, meeting }) => {
+    const { teachingMethod } = meeting;
+    const newTimetable = { ...timetable };
+    code = code.toUpperCase();
+    section = section.toUpperCase();
+
+    if (action === "add") {
+      if (!Object.keys(timetable).includes(session)) {
+        newTimetable[session] = {};
+      }
+      if (!Object.keys(newTimetable[session]).includes(`${code}${section}`)) {
+        newTimetable[session][`${code}${section}`] = {};
+      }
+      newTimetable[session][`${code}${section}`][teachingMethod] = meeting;
+      localStorage.setItem(timetablesKey, JSON.stringify(newTimetable));
+    } else if (action === "remove") {
+      if (
+        !Object.keys(timetable).includes(session) ||
+        !Object.keys(newTimetable[session]).includes(`${code}${section}`) ||
+        !Object.keys(newTimetable[session][`${code}${section}`]).includes(
+          teachingMethod
+        )
+      ) {
+        return;
+      }
+      delete newTimetable[session][`${code}${section}`][teachingMethod];
+      localStorage.setItem(timetablesKey, JSON.stringify(newTimetable));
+    }
+    setTimetable(newTimetable);
   };
 
   const onQuickPanelCourseSelection = () => {
@@ -151,7 +165,7 @@ const App = () => {
         <Box sx={mobile ? sv.contentMobileWrapper : sv.contentWrapper}>
           <Switchboard
             favoritesControl={[favorites, updateFavorite]}
-            timetablesControl={[timetables, updateTimetables]}
+            timetableControl={[timetable, updateTimetable]}
             currFetchedData={currFetchedData}
             currDisplayedDataControl={[currDisplayedData, setCurrDisplayedData]}
           />
