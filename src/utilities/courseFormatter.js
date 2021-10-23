@@ -197,7 +197,7 @@ const extractInstructorsAndOccupancy = (meetings) => {
         instructorsSet.add(name);
       }
     });
-    if (!v["cancel"]) {
+    if (!v["cancel"] && Number(v["enrollmentCapacity"] > 0)) {
       ratio += Number(v["actualEnrolment"]) / Number(v["enrollmentCapacity"]);
     }
   });

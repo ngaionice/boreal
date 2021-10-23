@@ -4,29 +4,39 @@ import { FavoritesScreen } from "./screens/FavoritesScreen";
 import { TimetableScreen } from "./screens/TimetableScreen";
 
 const Switchboard = ({
-  favoritesControl,
+  favorites,
+  dispatchFavorites,
   currFetchedData,
-  currDisplayedDataControl,
-  timetableControl,
+  currDisplayedData,
+  setCurrDisplayedData,
+  timetable,
+  dispatchTimetable,
 }) => {
-  const [favorites] = favoritesControl;
   return (
     <Switch>
       <Route path="/course">
         <CourseScreen
-          currDisplayedDataControl={currDisplayedDataControl}
+          currDisplayedData={currDisplayedData}
+          setCurrDisplayedData={setCurrDisplayedData}
           currFetchedData={currFetchedData}
           favorites={favorites}
-          timetableControl={timetableControl}
+          timetable={timetable}
+          dispatchTimetable={dispatchTimetable}
         />
       </Route>
 
       <Route path="/bookmarks">
-        <FavoritesScreen favoritesControl={favoritesControl} />
+        <FavoritesScreen
+          favorites={favorites}
+          dispatchFavorites={dispatchFavorites}
+        />
       </Route>
 
       <Route path="/timetable">
-        <TimetableScreen timetableControl={timetableControl} />
+        <TimetableScreen
+          timetable={timetable}
+          dispatchTimetable={dispatchTimetable}
+        />
       </Route>
     </Switch>
   );

@@ -26,14 +26,15 @@ import { Loader } from "../components/Loader";
 import { PastOfferings } from "../components/course/PastOfferings";
 
 const CourseScreen = ({
-  currDisplayedDataControl,
+  currDisplayedData,
+  setCurrDisplayedData,
   currFetchedData,
   favorites,
-  timetableControl,
+  timetable,
+  dispatchTimetable,
 }) => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [currDisplayedData, setCurrDisplayedData] = currDisplayedDataControl;
   const online = useRef(true);
 
   const themeFunction = useTheme();
@@ -98,7 +99,6 @@ const CourseScreen = ({
           setLoading(false);
         });
     }
-    // eslint-disable-next-line
   }, [location]);
 
   if (loading) {
@@ -166,7 +166,8 @@ const CourseScreen = ({
             })}
             <Meetings
               data={meetings}
-              timetableControl={timetableControl}
+              timetable={timetable}
+              dispatchTimetable={dispatchTimetable}
               section={section}
               session={session}
               code={code}

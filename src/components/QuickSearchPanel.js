@@ -19,12 +19,15 @@ import _ from "lodash";
 import { styles } from "../theme";
 import { Loader } from "./Loader";
 
-const Search = ({ fetchedDataControl, onCourseSelection, onButtonClick }) => {
+const Search = ({
+  fetchedData,
+  setFetchedData,
+  onCourseSelection,
+  onButtonClick,
+}) => {
   // search
   const [searchTerm, setSearchTerm] = useState("");
-  const searchInstance = useRef(0);
 
-  const [fetchedData, setFetchedData] = fetchedDataControl;
   const [loading, setLoading] = useState(false);
   const retrievedOn = useRef(new Date());
 
@@ -40,12 +43,13 @@ const Search = ({ fetchedDataControl, onCourseSelection, onButtonClick }) => {
   };
 
   useEffect(() => {
-    const search = async (currSearchInstance) => {
+    let didCancel = false;
+    const search = async () => {
       const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
       retrievedOn.current = new Date();
       const { data } = await axios.get(url, { headers: {} });
 
-      if (searchInstance.current === currSearchInstance) {
+      if (!didCancel) {
         Object.keys(data).forEach((key) => {
           data[key]["updated"] = retrievedOn.current;
         });
@@ -55,32 +59,28 @@ const Search = ({ fetchedDataControl, onCourseSelection, onButtonClick }) => {
     };
 
     const execute = () => {
-      searchInstance.current += 1;
       setLoading(true);
       setPage(1);
-      search(searchInstance.current).then(() => setLoading(false));
+      search().then(() => setLoading(false));
     };
 
-    if (searchTerm && !fetchedData) {
-      execute();
-    } else {
-      const timerId = setTimeout(() => {
-        if (searchTerm) {
-          execute();
-        }
-      }, 500);
+    const timerId = setTimeout(() => {
+      if (searchTerm) {
+        execute();
+      }
+    }, 500);
 
-      return () => {
-        clearTimeout(timerId);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
+    return () => {
+      clearTimeout(timerId);
+      didCancel = true;
+    };
+  }, [searchTerm, setFetchedData]);
 
   return (
     <Stack flex={1} spacing={1}>
       <SearchOptions
-        searchTermControl={[searchTerm, setSearchTerm]}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         onButtonClick={onButtonClick}
       />
       <Results
@@ -90,21 +90,20 @@ const Search = ({ fetchedDataControl, onCourseSelection, onButtonClick }) => {
         pageControl={[page, setPage]}
         noOfPages={noOfPages}
         itemsPerPage={itemsPerPage}
+        searchTerm={searchTerm}
       />
     </Stack>
   );
 };
 
-const SearchOptions = ({ searchTermControl, onButtonClick }) => {
-  const [searchTerm, setSearchTerm] = searchTermControl;
-
+const SearchOptions = ({ searchTerm, setSearchTerm, onButtonClick }) => {
   return (
     <form noValidate autoComplete="off">
       <Stack spacing={1}>
         <TextField
           id="code-input"
           label="Course Code"
-          variant="filled"
+          variant="outlined"
           placeholder="Quick search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
@@ -138,18 +137,29 @@ const Results = ({
   pageControl,
   itemsPerPage,
   noOfPages,
+  searchTerm,
 }) => {
+  // only show results if not loading, search term is not empty, and there are actually results
   if (loading) {
     return <Loader />;
   }
 
-  if (data === null || _.isEmpty(data)) {
+  if (!searchTerm) {
     return (
       <Stack spacing={1} justifyContent="center" alignItems="center">
         <Divider flexItem />
         <Typography variant="body2">
           Start searching to see courses here!
         </Typography>
+      </Stack>
+    );
+  }
+
+  if (data === null || _.isEmpty(data)) {
+    return (
+      <Stack spacing={1} justifyContent="center" alignItems="center">
+        <Divider flexItem />
+        <Typography variant="body2">No courses found.</Typography>
       </Stack>
     );
   }

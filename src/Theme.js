@@ -75,12 +75,6 @@ const styles = () => {
         md: "none",
       },
     },
-    tabs: {
-      height: "48px",
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
     content: {
       flexGrow: 1,
       padding: 3,
@@ -101,10 +95,7 @@ const styles = () => {
       paddingBottom: 5,
     },
     loader: {
-      padding: 3,
-    },
-    gridItem: {
-      height: "100%",
+      padding: 2,
     },
   };
 };

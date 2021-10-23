@@ -2,8 +2,7 @@ import { Container, Select, Typography } from "@mui/material";
 import { useState } from "react";
 import _ from "lodash";
 
-const TimetableScreen = ({ timetableControl }) => {
-  const [timetable, updateTimetable] = timetableControl;
+const TimetableScreen = ({ timetable, dispatchTimetable }) => {
   const [currSession, setCurrSession] = useState(
     _.last(Object.keys(timetable))
   );

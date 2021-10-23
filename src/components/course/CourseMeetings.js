@@ -16,8 +16,9 @@ import {
   useTheme,
 } from "@mui/material";
 
-import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { useState } from "react";
 import _ from "lodash";
 
@@ -33,7 +34,8 @@ import {
 const MeetingListing = ({
   meeting,
   onClick,
-  timetableControl,
+  timetable,
+  dispatchTimetable,
   session,
   section,
   code,
@@ -57,7 +59,6 @@ const MeetingListing = ({
 
     cancel,
   } = meeting;
-  const [timetable, updateTimetable] = timetableControl;
 
   const ListItemSecondary = () => {
     const theme = useTheme();
@@ -177,31 +178,47 @@ const MeetingListing = ({
     );
   };
 
+  const getSecondaryAction = () => {
+    if (cancel) {
+      return (
+        <IconButton disabled>
+          <AddCircleIcon />
+        </IconButton>
+      );
+    }
+    return (
+      <Tooltip
+        placement="left"
+        title={`${!isEntryInTimetable() ? "Add to" : "Remove from"} timetable`}
+      >
+        <IconButton
+          onClick={() =>
+            dispatchTimetable({
+              type: !isEntryInTimetable() ? "add" : "remove",
+              payload: {
+                session,
+                code,
+                section,
+                meeting,
+              },
+            })
+          }
+        >
+          {!isEntryInTimetable() ? <AddCircleIcon /> : <RemoveCircleIcon />}
+        </IconButton>
+      </Tooltip>
+    );
+  };
+
   return (
     <ListItem disableGutters>
-      <ListItemButton onClick={onItemClick}>
+      <ListItemButton onClick={onItemClick} disabled={cancel}>
         <Stack>
           <ListItemText primary={lectureSection} />
           <ListItemSecondary />
         </Stack>
       </ListItemButton>
-      <ListItemSecondaryAction>
-        {isEntryInTimetable() ? (
-          <IconButton disabled>
-            <EventAvailableIcon />
-          </IconButton>
-        ) : (
-          <Tooltip title="Add to timetable" placement="left">
-            <IconButton
-              onClick={() =>
-                updateTimetable("add", { session, code, section, meeting })
-              }
-            >
-              <EventAvailableIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </ListItemSecondaryAction>
+      <ListItemSecondaryAction>{getSecondaryAction()}</ListItemSecondaryAction>
     </ListItem>
   );
 };
@@ -209,7 +226,8 @@ const MeetingListing = ({
 const MeetingListings = ({
   data,
   onListEntryClick,
-  timetableControl,
+  timetable,
+  dispatchTimetable,
   section,
   session,
   code,
@@ -221,7 +239,8 @@ const MeetingListings = ({
           meeting={v}
           onClick={onListEntryClick}
           key={k}
-          timetableControl={timetableControl}
+          timetable={timetable}
+          dispatchTimetable={dispatchTimetable}
           section={section}
           session={session}
           code={code}
@@ -299,7 +318,14 @@ const DialogContent = ({ data }) => {
   );
 };
 
-const CourseMeetings = ({ data, timetableControl, section, session, code }) => {
+const CourseMeetings = ({
+  data,
+  timetable,
+  dispatchTimetable,
+  section,
+  session,
+  code,
+}) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState({
     section: "",
@@ -328,7 +354,8 @@ const CourseMeetings = ({ data, timetableControl, section, session, code }) => {
       <MeetingListings
         data={data}
         onListEntryClick={entryClick}
-        timetableControl={timetableControl}
+        timetable={timetable}
+        dispatchTimetable={dispatchTimetable}
         section={section}
         session={session}
         code={code}

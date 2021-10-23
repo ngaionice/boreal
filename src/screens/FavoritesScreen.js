@@ -19,9 +19,7 @@ const Title = () => {
   return <Typography variant="h4">Bookmarked Courses</Typography>;
 };
 
-const FavoritesList = ({ favoritesControl }) => {
-  const [favorites, updateFavorite] = favoritesControl;
-
+const FavoritesList = ({ favorites, dispatchFavorites }) => {
   if (Object.keys(favorites).length < 1) {
     return (
       <Box display="flex" justifyContent="center">
@@ -50,7 +48,10 @@ const FavoritesList = ({ favoritesControl }) => {
         <ListItemSecondaryAction>
           <IconButton
             onClick={() =>
-              updateFavorite("remove", `${code}-${section}-${session}`)
+              dispatchFavorites({
+                type: "remove",
+                payload: `${code}-${section}-${session}`,
+              })
             }
           >
             <ClearIcon />
@@ -71,12 +72,15 @@ const FavoritesList = ({ favoritesControl }) => {
   );
 };
 
-const FavoritesScreen = ({ favoritesControl }) => {
+const FavoritesScreen = ({ favorites, dispatchFavorites }) => {
   return (
     <Container maxWidth="lg">
       <Stack spacing={3} divider={<Divider />}>
         <Title />
-        <FavoritesList favoritesControl={favoritesControl} />
+        <FavoritesList
+          favorites={favorites}
+          dispatchFavorites={dispatchFavorites}
+        />
       </Stack>
     </Container>
   );

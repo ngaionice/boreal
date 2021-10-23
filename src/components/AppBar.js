@@ -33,12 +33,12 @@ const AppBar = ({
   title,
   navControl,
   themeControl,
-  favoriteControl,
+  isCurrFavorite,
+  dispatchFavorites,
   mobile,
 }) => {
   const [dark, setDark] = themeControl;
   const [expandNav, setExpandNav] = navControl;
-  const [isCurrFavorite, modifyFavorites] = favoriteControl;
   const [favorite, setFavorite] = useState(isCurrFavorite);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const AppBar = ({
   };
 
   const handleFavoritesToggle = () => {
-    modifyFavorites(!favorite ? "add" : "remove");
+    dispatchFavorites({ type: !favorite ? "add" : "remove" });
   };
 
   const classes = styles();
@@ -71,7 +71,7 @@ const AppBar = ({
     if (!title) return null;
 
     return (
-      <Tooltip title={`${favorite ? "Remove from" : "Add to"} favorites`}>
+      <Tooltip title={`${favorite ? "Remove from" : "Add to"} bookmarks`}>
         <IconButton color="inherit" onClick={handleFavoritesToggle}>
           {favorite ? <BookmarkRemoveIcon /> : <BookmarkAddIcon />}
         </IconButton>
