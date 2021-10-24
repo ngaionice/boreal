@@ -50,7 +50,7 @@ const FavoritesList = ({ favorites, dispatchFavorites }) => {
             onClick={() =>
               dispatchFavorites({
                 type: "remove",
-                payload: `${code}-${section}-${session}`,
+                courseId: `${code}-${section}-${session}`,
               })
             }
           >

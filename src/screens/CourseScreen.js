@@ -20,10 +20,11 @@ import {
   AdditionalInstructions,
 } from "../components/course/CourseInformation";
 import { CourseMeetings as Meetings } from "../components/course/CourseMeetings";
-import { formatDate } from "../utilities/courseFormatter";
-import { getSearchInstance } from "../utilities/fetcher";
 import { Loader } from "../components/Loader";
 import { PastOfferings } from "../components/course/PastOfferings";
+
+import { formatDate } from "../utilities/courseFormatter";
+import { fetchAndSetDisplayedData } from "../utilities/fetcher";
 
 const CourseScreen = ({
   currDisplayedData,
@@ -34,72 +35,49 @@ const CourseScreen = ({
   dispatchTimetable,
 }) => {
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const online = useRef(true);
 
   const themeFunction = useTheme();
-  const pastOfferingsOnSide = useMediaQuery(
-    themeFunction.breakpoints.down("lg")
-  );
+  const singleColumn = useMediaQuery(themeFunction.breakpoints.down("lg"));
 
-  // summary: try to load from current data, if not then
-  // 1) if offline: try to load from favs
+  // summary: on url change, try to load from current data, if not then
+  // 1) if offline: try to load from favorites
   // 2) if online: fetch from api
   // then push to curr displayed data
   useEffect(() => {
-    const pathSplit = location.pathname
-      .replace("/course", "")
-      .toUpperCase()
-      .split("/")
-      .filter((val) => val);
+    online.current = window.navigator.onLine;
+    const pathData = pathnameSplitter(location.pathname);
 
-    if (pathSplit.length !== 3) {
+    if (pathData.length !== 3) {
       setCurrDisplayedData({});
       setLoading(false);
-    }
-
-    const code = pathSplit[2],
-      section = pathSplit[1],
-      session = pathSplit[0];
-    const currDisplayedId = `${code}-${section}-${session}`;
-
-    if (currFetchedData.hasOwnProperty(currDisplayedId)) {
-      setCurrDisplayedData(currFetchedData[currDisplayedId]);
-      setLoading(false);
     } else {
-      setLoading(true);
-      if (!window.navigator.onLine) {
-        online.current = false;
+      const [session, section, code] = pathData;
+      const currDisplayedId = `${code}-${section}-${session}`;
+
+      if (currFetchedData.hasOwnProperty(currDisplayedId)) {
+        setCurrDisplayedData(currFetchedData[currDisplayedId]);
+        setLoading(false);
+      } else if (online.current) {
+        fetchAndSetDisplayedData(pathData, setCurrDisplayedData).then(() =>
+          setLoading(false)
+        );
+      } else {
         if (favorites.hasOwnProperty(currDisplayedId)) {
           setCurrDisplayedData(favorites[currDisplayedId]);
         } else {
           setCurrDisplayedData({});
         }
         setLoading(false);
-        return;
       }
-      const retrievedOn = new Date();
-      getSearchInstance()
-        .get(`${session}/courses/`, {
-          params: { code, section },
-        })
-        .then((res) => {
-          setCurrDisplayedData(
-            !res.data[currDisplayedId]
-              ? {}
-              : {
-                  ...res.data[currDisplayedId],
-                  updated: retrievedOn,
-                }
-          );
-          setLoading(false);
-        })
-        .catch(() => {
-          setCurrDisplayedData({});
-          setLoading(false);
-        });
     }
-  }, [location]);
+
+    return () => {
+      setCurrDisplayedData({});
+      setLoading(true);
+    };
+  }, [location, setCurrDisplayedData]);
 
   if (loading) {
     return <Loader />;
@@ -172,7 +150,7 @@ const CourseScreen = ({
               session={session}
               code={code}
             />
-            {pastOfferingsOnSide ? (
+            {singleColumn ? (
               <PastOfferings
                 courseCode={code}
                 currSection={section}
@@ -184,7 +162,7 @@ const CourseScreen = ({
         </Container>
       </Grid>
 
-      {pastOfferingsOnSide ? null : (
+      {singleColumn ? null : (
         <Grid item xs={12} lg={3}>
           <Container maxWidth="sm">
             <PastOfferings
@@ -199,5 +177,12 @@ const CourseScreen = ({
     </Grid>
   );
 };
+
+const pathnameSplitter = (pathname) =>
+  pathname
+    .replace("/course", "")
+    .toUpperCase()
+    .split("/")
+    .filter((val) => val);
 
 export { CourseScreen };

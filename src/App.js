@@ -9,7 +9,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import _ from "lodash";
 
 import { styles, theme } from "./theme";
 import { QuickSearchPanel } from "./components/QuickSearchPanel";
@@ -17,6 +16,12 @@ import { Drawer } from "./components/Drawer";
 import { AppBar } from "./components/AppBar";
 import { Switchboard } from "./Switchboard";
 import { getPageTitle } from "./utilities/misc";
+import {
+  timetableReducer,
+  favoritesReducer,
+  favoritesKey,
+  timetablesKey,
+} from "./reducers";
 
 const loadExistingFavorites = (favoritesKey) => {
   const existingFavorites = localStorage.getItem(favoritesKey);
@@ -26,54 +31,6 @@ const loadExistingFavorites = (favoritesKey) => {
 const loadExistingTimetable = (timetablesKey) => {
   const existingTimetables = localStorage.getItem(timetablesKey);
   return existingTimetables ? JSON.parse(existingTimetables) : {};
-};
-
-// to be fixed eventually when stable
-const favoritesKey = "dfsoudfhsud";
-const timetablesKey = "asfoahfisd";
-
-const timetableReducer = (state, action) => {
-  if (action.type === "reset") {
-    localStorage.setItem(timetablesKey, JSON.stringify(action.payload));
-    return action.payload;
-  }
-
-  let { session, code, section, meeting } = action.payload;
-  const { teachingMethod } = meeting;
-  let updatedTimetable = { ...state };
-  code = code.toUpperCase();
-  section = section.toUpperCase();
-
-  switch (action.type) {
-    case "add":
-      if (!Object.keys(updatedTimetable).includes(session)) {
-        updatedTimetable[session] = {};
-      }
-      if (
-        !Object.keys(updatedTimetable[session]).includes(`${code}${section}`)
-      ) {
-        updatedTimetable[session][`${code}${section}`] = {};
-      }
-      updatedTimetable[session][`${code}${section}`][teachingMethod] = meeting;
-      break;
-    case "remove":
-      if (
-        Object.keys(updatedTimetable).includes(session) &&
-        Object.keys(updatedTimetable[session]).includes(`${code}${section}`) &&
-        Object.keys(updatedTimetable[session][`${code}${section}`]).includes(
-          teachingMethod
-        )
-      ) {
-        delete updatedTimetable[session][`${code}${section}`][teachingMethod];
-      }
-      break;
-    default:
-      throw new Error(
-        `Called timetableReducer with unknown action type ${action.type}`
-      );
-  }
-  localStorage.setItem(timetablesKey, JSON.stringify(updatedTimetable));
-  return updatedTimetable;
 };
 
 const App = () => {
@@ -89,44 +46,8 @@ const App = () => {
   const [currDisplayedData, setCurrDisplayedData] = useState({});
   const [currFetchedData, setCurrFetchedData] = useState({});
 
-  const getId = () => {
-    if (_.isEmpty(currDisplayedData)) return null;
-    return `${currDisplayedData.code}-${currDisplayedData.section}-${currDisplayedData.session}`;
-  };
-
-  const favoriteReducer = (state, action) => {
-    const courseId = getId();
-    if (!courseId && action.type !== "reset") {
-      throw new Error("Called favoriteReducer while course ID is invalid.");
-    }
-    let updatedState;
-    switch (action.type) {
-      case "add":
-        updatedState = {
-          ...state,
-          [courseId]: currDisplayedData,
-        };
-        break;
-      case "remove":
-        updatedState = _.omit(
-          state,
-          action.payload ? action.payload : courseId
-        );
-        break;
-      case "reset":
-        updatedState = action.payload;
-        break;
-      default:
-        throw new Error(
-          `Called favoriteReducer with invalid action.type: ${action.type}`
-        );
-    }
-    localStorage.setItem(favoritesKey, JSON.stringify(updatedState));
-    return updatedState;
-  };
-
   const [favorites, dispatchFavorites] = useReducer(
-    favoriteReducer,
+    favoritesReducer,
     loadExistingFavorites(favoritesKey)
   );
 
@@ -159,9 +80,12 @@ const App = () => {
     const newTitle = getPageTitle(pathname, currDisplayedData, mobile);
 
     setAppBarTitle(location.pathname.startsWith("/course") ? newTitle : "");
-    document.title = `Boreal${newTitle === "Boreal" ? "" : " — " + newTitle}`;
+    document.title = `${
+      newTitle === "Boreal" ? newTitle : newTitle + " — Boreal"
+    }`;
   }, [location, currDisplayedData, mobile]);
 
+  // theme updates
   useEffect(() => {
     localStorage.setItem("darkMode", dark ? "dark" : "light");
   }, [dark]);
@@ -176,9 +100,13 @@ const App = () => {
         <CssBaseline />
         <AppBar
           title={appBarTitle}
-          navControl={[isNavExpanded, setIsNavExpanded]}
-          themeControl={[dark, setDark]}
-          isCurrFavorite={Object.keys(favorites).includes(getId())}
+          expandNav={isNavExpanded}
+          setExpandNav={setIsNavExpanded}
+          dark={dark}
+          setDark={setDark}
+          currDisplayedData={currDisplayedData}
+          setCurrDisplayedData={setCurrDisplayedData}
+          favorites={favorites}
           dispatchFavorites={dispatchFavorites}
           mobile={mobile}
         />
@@ -186,7 +114,6 @@ const App = () => {
           <QuickSearchPanel
             fetchedData={currFetchedData}
             setFetchedData={setCurrFetchedData}
-            fetchedDataControl={[currFetchedData, setCurrFetchedData]}
             onCourseSelection={onQuickPanelCourseSelection}
             onButtonClick={() => setIsNavExpanded(!isNavExpanded)}
           />

@@ -212,7 +212,7 @@ const MeetingListing = ({
 
   return (
     <ListItem disableGutters>
-      <ListItemButton onClick={onItemClick} disabled={cancel}>
+      <ListItemButton onClick={onItemClick} disabled={Boolean(cancel)}>
         <Stack>
           <ListItemText primary={lectureSection} />
           <ListItemSecondary />

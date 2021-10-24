@@ -1,11 +1,13 @@
 import {
   AppBar as MuiAppBar,
+  CircularProgress,
   IconButton,
   Toolbar,
   Tooltip,
   Typography,
   useScrollTrigger,
 } from "@mui/material";
+import _ from "lodash";
 
 import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
@@ -16,6 +18,8 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 
 import { styles } from "../theme";
 import { cloneElement, useEffect, useState } from "react";
+import { getCourseId } from "../utilities/misc";
+import { fetchAndSetDisplayedData } from "../utilities/fetcher";
 
 const ElevationScroll = (props) => {
   const { children } = props;
@@ -31,14 +35,19 @@ const ElevationScroll = (props) => {
 
 const AppBar = ({
   title,
-  navControl,
-  themeControl,
-  isCurrFavorite,
+  expandNav,
+  setExpandNav,
+  dark,
+  setDark,
+  currDisplayedData,
+  setCurrDisplayedData,
+  favorites,
   dispatchFavorites,
   mobile,
 }) => {
-  const [dark, setDark] = themeControl;
-  const [expandNav, setExpandNav] = navControl;
+  const isCurrFavorite = Object.keys(favorites).includes(
+    getCourseId(currDisplayedData)
+  );
   const [favorite, setFavorite] = useState(isCurrFavorite);
 
   useEffect(() => {
@@ -50,7 +59,11 @@ const AppBar = ({
   };
 
   const handleFavoritesToggle = () => {
-    dispatchFavorites({ type: !favorite ? "add" : "remove" });
+    dispatchFavorites({
+      type: !favorite ? "add" : "remove",
+      courseId: getCourseId(currDisplayedData),
+      payload: currDisplayedData,
+    });
   };
 
   const classes = styles();
@@ -80,12 +93,43 @@ const AppBar = ({
   };
 
   const RefreshButton = () => {
-    if (!title) return null;
+    const [loading, setLoading] = useState(false);
 
-    // TODO: pass in function to be called
+    useEffect(() => {
+      let mounted = true;
+      if (loading) {
+        const { session, section, code } = currDisplayedData;
+        fetchAndSetDisplayedData(
+          [session, section, code],
+          setCurrDisplayedData
+        ).then(() => {
+          if (mounted) {
+            setLoading(false);
+          }
+        });
+      }
+      return () => {
+        mounted = false;
+      };
+    }, [loading]);
+
+    const onRefresh = () => {
+      setLoading(true);
+    };
+
+    if (!title || _.isEmpty(currDisplayedData)) return null;
+
+    if (loading) {
+      return (
+        <IconButton color="inherit" disabled>
+          <CircularProgress size={24} color="inherit" />
+        </IconButton>
+      );
+    }
+
     return (
       <Tooltip title="Refresh course">
-        <IconButton color="inherit">
+        <IconButton color="inherit" onClick={onRefresh}>
           <RefreshIcon />
         </IconButton>
       </Tooltip>
@@ -120,7 +164,7 @@ const AppBar = ({
         <Toolbar>
           <DrawerButton />
           <Title />
-          {/*<RefreshButton />*/}
+          <RefreshButton />
           <FavoritesButton />
           <BrightnessButton />
         </Toolbar>

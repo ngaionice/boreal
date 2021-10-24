@@ -11,12 +11,13 @@ import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import _ from "lodash";
 
+import { Loader } from "../Loader";
+
 import { fetchPastOfferings as fetch } from "../../utilities/data-scraper";
 import {
   getYearLabel,
   extractInstructorsAndOccupancy,
 } from "../../utilities/courseFormatter";
-import { Loader } from "../Loader";
 
 const PastOfferings = ({ courseCode, currSection, currSession, mobile }) => {
   const [loading, setLoading] = useState(false);
@@ -29,13 +30,18 @@ const PastOfferings = ({ courseCode, currSection, currSession, mobile }) => {
         session: currSession,
         section: currSection,
       });
-      if (!mounted.current) return;
-      setData(results);
+      if (mounted.current) {
+        setData(results);
+      }
     };
 
     const execute = () => {
       setLoading(true);
-      search().then(() => setLoading(false));
+      search().then(() => {
+        if (mounted.current) {
+          setLoading(false);
+        }
+      });
     };
 
     mounted.current = true;

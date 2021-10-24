@@ -36,7 +36,10 @@ const fetchPastOfferings = async (courseCode, omit = null) => {
       });
       return store;
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error);
+      return {};
+    });
 };
 
 // const fetchPastOfferings = async (deptCode) => {

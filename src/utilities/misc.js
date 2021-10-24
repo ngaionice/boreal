@@ -31,4 +31,9 @@ const getPageTitle = (pathname, currDisplayedCourse, mobile) => {
   }
 };
 
-export { getPageTitle };
+const getCourseId = (courseData) => {
+  if (_.isEmpty(courseData)) return null;
+  return `${courseData.code}-${courseData.section}-${courseData.session}`;
+};
+
+export { getPageTitle, getCourseId };
