@@ -11,7 +11,7 @@ import {
   Toolbar,
 } from "@mui/material";
 
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -84,6 +84,8 @@ const DrawerContent = ({ children, mobileClose }) => (
 );
 
 const Drawer = ({ children, navControl, mobile }) => {
+  const location = useLocation();
+
   const [expandNav, setExpandNav] = navControl;
 
   const classes = styles();
@@ -93,6 +95,10 @@ const Drawer = ({ children, navControl, mobile }) => {
   const handleDrawerToggle = () => {
     setExpandNav(!expandNav);
   };
+
+  if (location.pathname === "/") {
+    return null;
+  }
 
   return (
     <Box sx={classes.drawer} aria-label="search">

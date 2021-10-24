@@ -1,10 +1,8 @@
 import { useEffect, useReducer, useState } from "react";
 import {
-  Box,
   CssBaseline,
   StyledEngineProvider,
   ThemeProvider,
-  Toolbar,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -118,18 +116,18 @@ const App = () => {
             onButtonClick={() => setIsNavExpanded(!isNavExpanded)}
           />
         </Drawer>
-        <Toolbar />
-        <Box sx={mobile ? sv.contentMobileWrapper : sv.contentWrapper}>
-          <Switchboard
-            favorites={favorites}
-            dispatchFavorites={dispatchFavorites}
-            timetable={timetable}
-            dispatchTimetable={dispatchTimetable}
-            currFetchedData={currFetchedData}
-            currDisplayedData={currDisplayedData}
-            setCurrDisplayedData={setCurrDisplayedData}
-          />
-        </Box>
+
+        <Switchboard
+          favorites={favorites}
+          dispatchFavorites={dispatchFavorites}
+          timetable={timetable}
+          dispatchTimetable={dispatchTimetable}
+          currFetchedData={currFetchedData}
+          setCurrFetchedData={setCurrFetchedData}
+          currDisplayedData={currDisplayedData}
+          setCurrDisplayedData={setCurrDisplayedData}
+          sv={mobile ? sv.contentMobileWrapper : sv.contentWrapper}
+        />
       </ThemeProvider>
     </StyledEngineProvider>
   );

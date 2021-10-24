@@ -9,7 +9,20 @@ const instance = () => {
 };
 
 // valid params
-// org:code:section:studyyear:daytime:weekday:prof:breadth:deliverymode:online:waitlist:available:fyfcourse:title:
+// org:
+// code:
+// section: f,s,y
+// studyyear: 1,2,3,4
+// daytime: am,pm,eve
+// weekday: MO,TU,WE,TH,FR
+// prof:
+// breadth: 1,2,3,4,5
+// deliverymode: onlsync,onlasync,class
+// online: t (if online is selected, delivery mode should be disabled)
+// waitlist: t (or blank if false)
+// available: t
+// fyfcourse: t
+// title:
 
 const fetchAndSetDisplayedData = async (
   [session, section, code],

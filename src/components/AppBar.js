@@ -20,6 +20,7 @@ import { styles } from "../theme";
 import { cloneElement, useEffect, useState } from "react";
 import { getCourseId } from "../utilities/misc";
 import { fetchAndSetDisplayedData } from "../utilities/fetcher";
+import { useLocation } from "react-router-dom";
 
 const ElevationScroll = (props) => {
   const { children } = props;
@@ -49,6 +50,7 @@ const AppBar = ({
     getCourseId(currDisplayedData)
   );
   const [favorite, setFavorite] = useState(isCurrFavorite);
+  const location = useLocation();
 
   useEffect(() => {
     setFavorite(isCurrFavorite);
@@ -137,7 +139,7 @@ const AppBar = ({
   };
 
   const DrawerButton = () => {
-    if (!mobile) return null;
+    if (!mobile || location.pathname === "/") return null;
 
     return (
       <IconButton
