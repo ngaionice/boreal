@@ -95,4 +95,128 @@ const deptCodes = (
   "WDW/WGS/WRR"
 ).split("/");
 
-export { years, deptCodes, instances };
+const daytime = [
+  {
+    value: "AM",
+    label: "Morning",
+  },
+  {
+    value: "PM",
+    label: "Afternoon",
+  },
+  {
+    value: "EVE",
+    label: "Evening",
+  },
+];
+
+const studyYears = [
+  {
+    value: "1",
+    label: "100-level",
+  },
+  {
+    value: "2",
+    label: "200-level",
+  },
+  {
+    value: "3",
+    label: "300-level",
+  },
+  {
+    value: "4",
+    label: "400-level",
+  },
+];
+
+const weekdays = [
+  {
+    value: "MO",
+    label: "Mon",
+  },
+  {
+    value: "TU",
+    label: "Tue",
+  },
+  {
+    value: "WE",
+    label: "Wed",
+  },
+  {
+    value: "TH",
+    label: "Thu",
+  },
+  {
+    value: "FR",
+    label: "Fri",
+  },
+];
+
+const breadth = [
+  {
+    value: "1",
+    label: "Creative and Cultural Representations (1)",
+  },
+  {
+    value: "2",
+    label: "Thought, Belief and Behaviour (2)",
+  },
+  {
+    value: "3",
+    label: "Society and its Institutions (3)",
+  },
+  {
+    value: "4",
+    label: "Living Things and Their Environment (4)",
+  },
+  {
+    value: "5",
+    label: "The Physical and Mathematical Universes (5)",
+  },
+];
+
+const deliveryModes = [
+  {
+    value: "ONLSYNC",
+    label: "Online - Synchronous",
+  },
+  {
+    value: "ONLASYNC",
+    label: "Online - Asynchronous",
+  },
+  {
+    value: "CLASS",
+    label: "In-person",
+  },
+];
+
+const sections = [
+  {
+    value: "F",
+    label: "Fall (F)",
+  },
+  {
+    value: "S",
+    label: "Winter (S)",
+  },
+  {
+    value: "Y",
+    label: "Year (Y)",
+  },
+];
+
+// TODO: add in department data
+const departments = [];
+
+export {
+  years,
+  deptCodes,
+  instances,
+  daytime,
+  studyYears,
+  weekdays,
+  breadth,
+  deliveryModes,
+  sections,
+  departments,
+};
