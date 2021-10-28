@@ -25,6 +25,7 @@ import { PastOfferings } from "../components/course/PastOfferings";
 
 import { formatDate } from "../utilities/courseFormatter";
 import { fetchAndSetDisplayedData } from "../utilities/fetcher";
+import { fetchPastOfferings as fetchHistoricalData } from "../utilities/data-scraper";
 
 const CourseScreen = ({
   currDisplayedData,
@@ -36,7 +37,10 @@ const CourseScreen = ({
 }) => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [loadingHistorical, setLoadingHistorical] = useState(true);
+  const [historicalData, setHistoricalData] = useState({});
   const online = useRef(true);
+  const pathname = useRef("");
 
   const themeFunction = useTheme();
   const singleColumn = useMediaQuery(themeFunction.breakpoints.down("lg"));
@@ -46,38 +50,64 @@ const CourseScreen = ({
   // 2) if online: fetch from api
   // then push to curr displayed data
   useEffect(() => {
+    if (location.pathname === pathname.current) {
+      setLoading(false);
+      setLoadingHistorical(false);
+      return;
+    }
+
+    pathname.current = location.pathname;
+    setCurrDisplayedData({});
+    setHistoricalData({});
     online.current = window.navigator.onLine;
     const pathData = pathnameSplitter(location.pathname);
 
-    if (pathData.length !== 3) {
-      setCurrDisplayedData({});
-      setLoading(false);
-    } else {
-      const [session, section, code] = pathData;
-      const currDisplayedId = `${code}-${section}-${session}`;
-
-      if (currFetchedData.hasOwnProperty(currDisplayedId)) {
-        setCurrDisplayedData(currFetchedData[currDisplayedId]);
-        setLoading(false);
-      } else if (online.current) {
-        fetchAndSetDisplayedData(pathData, setCurrDisplayedData).then(() =>
-          setLoading(false)
-        );
+    const setCurrentData = async () => {
+      if (pathData.length !== 3) {
+        throw new Error("Invalid URL.");
       } else {
-        if (favorites.hasOwnProperty(currDisplayedId)) {
-          setCurrDisplayedData(favorites[currDisplayedId]);
+        const [session, section, code] = pathData;
+        const currDisplayedId = `${code}-${section}-${session}`;
+
+        if (currFetchedData.hasOwnProperty(currDisplayedId)) {
+          setCurrDisplayedData(currFetchedData[currDisplayedId]);
+        } else if (online.current) {
+          await fetchAndSetDisplayedData(pathData, setCurrDisplayedData);
         } else {
-          setCurrDisplayedData({});
+          if (favorites.hasOwnProperty(currDisplayedId)) {
+            setCurrDisplayedData(favorites[currDisplayedId]);
+          } else {
+            throw new Error("Offline and not favorited.");
+          }
         }
-        setLoading(false);
+        return [session, section, code];
       }
-    }
+    };
+
+    const setPastOfferingsData = async ([session, section, code]) => {
+      const results = await fetchHistoricalData(code, {
+        session,
+        section,
+      });
+      setHistoricalData(results);
+    };
+
+    setCurrentData()
+      .then(async (info) => {
+        setLoading(false);
+        await setPastOfferingsData(info);
+      })
+      .then(() => setLoadingHistorical(false))
+      .catch(() => {
+        setLoading(false);
+        setLoadingHistorical(false);
+      });
 
     return () => {
-      setCurrDisplayedData({});
       setLoading(true);
+      setLoadingHistorical(true);
     };
-  }, [location, setCurrDisplayedData]);
+  }, [location, setCurrDisplayedData, currFetchedData, favorites]);
 
   if (loading) {
     return <Loader />;
@@ -152,9 +182,8 @@ const CourseScreen = ({
             />
             {singleColumn ? (
               <PastOfferings
-                courseCode={code}
-                currSection={section}
-                currSession={session}
+                data={historicalData}
+                loading={loadingHistorical}
                 mobile={true}
               />
             ) : null}
@@ -166,9 +195,8 @@ const CourseScreen = ({
         <Grid item xs={12} lg={3}>
           <Container maxWidth="sm">
             <PastOfferings
-              courseCode={code}
-              currSection={section}
-              currSession={session}
+              data={historicalData}
+              loading={loadingHistorical}
               mobile={false}
             />
           </Container>

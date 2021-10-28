@@ -1,43 +1,68 @@
 import {
   Autocomplete,
+  Box,
   Card,
+  CardActions,
+  CardContent,
+  Checkbox,
+  Collapse,
   Container,
   Divider,
-  TextField,
-  Grid,
-  List,
-  Stack,
-  Typography,
-  CardContent,
-  CardActions,
-  IconButton,
-  Collapse,
-  Tooltip,
   FormControlLabel,
-  Checkbox,
+  FormGroup,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Pagination,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import ClearIcon from "@mui/icons-material/Clear";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
+import SearchIcon from "@mui/icons-material/Search";
+
+import { useEffect, useRef, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import _ from "lodash";
 
 import {
   breadth,
   daytime,
   deliveryModes,
-  departments,
-  sections,
+  departments as deptOptions,
+  sections as sectionOptions,
   studyYears,
   weekdays,
   years,
 } from "../utilities/searchOptions";
+import { getSearchInstance } from "../utilities/fetcher";
+import { Loader } from "../components/Loader";
 
-const SearchScreen = ({ currFetchedData, setCurrFetchedData }) => {
+const SearchScreen = ({
+  currFetchedData,
+  setCurrFetchedData,
+  setCurrDisplayedData,
+}) => {
+  const [loading, setLoading] = useState(false);
+
   return (
     <Container maxWidth="lg">
       <Stack spacing={3} divider={<Divider />}>
         <Typography variant="h4">Search</Typography>
-        <SearchOptions setCurrFetchedData={setCurrFetchedData} />
-        <SearchResults currFetchedData={currFetchedData} />
+        <SearchOptions
+          setCurrFetchedData={setCurrFetchedData}
+          setLoading={setLoading}
+        />
+        <SearchResults
+          currFetchedData={currFetchedData}
+          setCurrDisplayedData={setCurrDisplayedData}
+          loading={loading}
+        />
       </Stack>
     </Container>
   );
@@ -49,40 +74,148 @@ const ExpandMore = styled((props) => {
 })(({ theme, expand }) => ({
   transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
   marginLeft: "auto",
-  marginRight: "auto",
+  // marginRight: "auto",
   transition: theme.transitions.create("transform", {
     duration: theme.transitions.duration.shortest,
   }),
 }));
 
-const SearchOptions = ({ setCurrFetchedData }) => {
+const SearchOptions = ({ setCurrFetchedData, setLoading }) => {
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => setExpanded(!expanded);
+  const mounted = useRef(true);
+
+  const [allowModes, setAllowModes] = useState(true);
+
+  const [title, setTitle] = useState("");
+  const [courseCode, setCourseCode] = useState("");
+  const [sections, setSections] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [levels, setLevels] = useState([]);
+  const [lastName, setLastName] = useState("");
+  const [days, setDays] = useState([]);
+  const [times, setTimes] = useState([]);
+  const [breadths, setBreadths] = useState([]);
+  const [year, setYear] = useState(_.last(years));
+  const [modes, setModes] = useState([]);
+  const [online, setOnline] = useState(false);
+  const [hasSpace, setHasSpace] = useState(false);
+  const [waitlist, setWaitlist] = useState(false);
+  const [fyf, setFyf] = useState(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  });
+
+  const search = () => {
+    setLoading(true);
+    const instance = getSearchInstance();
+    const retrievedOn = new Date();
+
+    const format = (param) => {
+      if (typeof param === "boolean") {
+        return param ? "T" : null;
+      }
+      if (typeof param === "string") {
+        return param ? param : null;
+      }
+      if (Array.isArray(param)) {
+        return !_.isEmpty(param) ? param.map((v) => v.value).join(",") : null;
+      }
+      throw new Error("Unaccounted for param type.");
+    };
+
+    instance
+      .get(`${year.value}/courses/`, {
+        params: {
+          // note that nulls are not rendered in URL, which is the goal here
+          title: format(title),
+          code: format(courseCode),
+          section: format(sections),
+          org: format(departments),
+          studyyear: format(levels),
+          prof: format(lastName),
+          weekday: format(days),
+          daytime: format(times),
+          breadth: format(breadths),
+          deliverymode: online ? null : format(modes),
+          online: format(online),
+          waitlist: format(waitlist),
+          available: format(hasSpace),
+          fyfcourse: format(fyf),
+        },
+      })
+      .then((res) => {
+        const { data } = res;
+        Object.keys(data).forEach((key) => {
+          data[key]["updated"] = retrievedOn;
+        });
+
+        if (mounted.current) {
+          setCurrFetchedData(data);
+        }
+      })
+      .then(() => setLoading(false));
+  };
+
+  const clear = () => {
+    setTitle("");
+    setCourseCode("");
+    setSections([]);
+    setDepartments([]);
+    setLevels([]);
+    setLastName("");
+    setDays([]);
+    setTimes([]);
+    setBreadths([]);
+    setYear(_.last(years));
+    setModes([]);
+    setOnline(false);
+    setHasSpace(false);
+    setWaitlist(false);
+    setFyf(false);
+  };
+
   return (
     <Card elevation={0}>
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField label="Course title" fullWidth />
+            <TextField
+              label="Course title"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
           </Grid>
           <Grid item xs={12} sm={3} lg={4}>
-            <TextField label="Course code" fullWidth />
+            <TextField
+              label="Course code"
+              fullWidth
+              value={courseCode}
+              onChange={(e) => setCourseCode(e.target.value)}
+            />
           </Grid>
           <Grid item xs={12} sm={9} lg={8}>
             <Autocomplete
               multiple
-              options={sections}
+              options={sectionOptions}
               getOptionLabel={(option) => option.label}
               filterSelectedOptions
               renderInput={(params) => (
                 <TextField {...params} label="Section(s)" />
               )}
+              value={sections}
+              onChange={(e, nv) => setSections(nv)}
             />
           </Grid>
           <Grid item xs={12}>
             <Autocomplete
               multiple
-              options={departments}
+              options={deptOptions}
               getOptionLabel={(option) => option.label}
               filterSelectedOptions
               renderInput={(params) => (
@@ -92,6 +225,7 @@ const SearchOptions = ({ setCurrFetchedData }) => {
           </Grid>
         </Grid>
       </CardContent>
+
       <Collapse in={expanded}>
         <CardContent>
           <Grid container spacing={2}>
@@ -107,10 +241,17 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 renderInput={(params) => (
                   <TextField {...params} label="Course level(s)" />
                 )}
+                value={levels}
+                onChange={(e, nv) => setLevels(nv)}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
-              <TextField label="Instructor's last name" fullWidth />
+              <TextField
+                label="Instructor's last name"
+                fullWidth
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </Grid>
             <Grid item xs={12} lg={6}>
               <Autocomplete
@@ -121,6 +262,8 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 renderInput={(params) => (
                   <TextField {...params} label="Day(s) of week" />
                 )}
+                value={days}
+                onChange={(e, nv) => setDays(nv)}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
@@ -132,6 +275,8 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 renderInput={(params) => (
                   <TextField {...params} label="Time(s) of day" />
                 )}
+                value={times}
+                onChange={(e, nv) => setTimes(nv)}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
@@ -143,6 +288,8 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 renderInput={(params) => (
                   <TextField {...params} label="Breadth requirement(s)" />
                 )}
+                value={breadths}
+                onChange={(e, nv) => setBreadths(nv)}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
@@ -153,6 +300,8 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 renderInput={(params) => (
                   <TextField {...params} label="Offering year" />
                 )}
+                value={year}
+                onChange={(e, nv) => setYear(nv)}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
@@ -162,35 +311,83 @@ const SearchOptions = ({ setCurrFetchedData }) => {
                 getOptionLabel={(option) => option.label}
                 filterSelectedOptions
                 renderInput={(params) => (
-                  <TextField {...params} label="Delivery modes (lectures)" />
+                  <TextField
+                    {...params}
+                    label={
+                      allowModes
+                        ? "Delivery modes (lectures)"
+                        : "Disabled as online only is selected"
+                    }
+                  />
                 )}
+                value={modes}
+                onChange={(e, nv) => setModes(nv)}
+                disabled={!allowModes}
               />
             </Grid>
             <Grid item xs={12} sm={6} lg={3}>
-              <FormControlLabel control={<Checkbox />} label={"Online only"} />
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={online}
+                      onChange={(e) => {
+                        setOnline(e.target.checked);
+                        setAllowModes(!e.target.checked);
+                        if (e.target.checked) {
+                          setModes([]);
+                        }
+                      }}
+                    />
+                  }
+                  label={"Online only"}
+                />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12} sm={6} lg={3}>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={hasSpace}
+                      onChange={(e) => setHasSpace(e.target.checked)}
+                    />
+                  }
+                  label={"Meetings with space only"}
+                />
+              </FormGroup>
             </Grid>
             <Grid item xs={12} sm={6} lg={3}>
               <FormControlLabel
-                control={<Checkbox />}
-                label={"Meetings with space only"}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} lg={3}>
-              <FormControlLabel
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    checked={waitlist}
+                    onChange={(e) => setWaitlist(e.target.checked)}
+                  />
+                }
                 label={"Waitlistable courses only"}
               />
             </Grid>
             <Grid item xs={12} sm={6} lg={3}>
               <FormControlLabel
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    checked={fyf}
+                    onChange={(e) => setFyf(e.target.checked)}
+                  />
+                }
                 label={"First-year foundations courses"}
               />
             </Grid>
           </Grid>
         </CardContent>
       </Collapse>
-      <CardActions sx={{ justifyContent: "center", alignItems: "center" }}>
+      <CardActions>
+        <Tooltip title="Clear options">
+          <IconButton sx={{ marginRight: "auto" }} onClick={clear}>
+            <ClearIcon />
+          </IconButton>
+        </Tooltip>
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
@@ -201,16 +398,76 @@ const SearchOptions = ({ setCurrFetchedData }) => {
             <ExpandMoreIcon />
           </Tooltip>
         </ExpandMore>
+        <Tooltip title="Search">
+          <IconButton sx={{ marginLeft: "auto" }} onClick={search}>
+            <SearchIcon />
+          </IconButton>
+        </Tooltip>
       </CardActions>
     </Card>
   );
 };
 
-const SearchResults = ({ currFetchedData }) => {
+const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
+  const [page, setPage] = useState(1);
+  const [noOfPages, setNoOfPages] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setPage(1);
+    setNoOfPages(Math.ceil(Object.keys(currFetchedData).length / itemsPerPage));
+  }, [currFetchedData]);
+
+  const onCourseClick = (data) => {
+    setCurrDisplayedData(data);
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (_.isEmpty(currFetchedData)) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Typography variant="body1">
+          Configure your options above, then hit search!
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <List dense>
-      <div />
-    </List>
+    <Stack display="flex" divider={<Divider />} spacing={3}>
+      <Box display="flex" alignItems="center" justifyContent="center">
+        <Pagination
+          count={noOfPages}
+          page={page}
+          onChange={(e, v) => setPage(v)}
+        />
+      </Box>
+      <List dense>
+        {Object.keys(currFetchedData)
+          .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+          .map((key) => {
+            const result = currFetchedData[key];
+            const { courseTitle, code, section, session } = result;
+            return (
+              <ListItem
+                button
+                key={key}
+                onClick={() => onCourseClick(result)}
+                component={RouterLink}
+                to={`/course/${session}/${section.toLowerCase()}/${code.toLowerCase()}`}
+              >
+                <ListItemText
+                  primary={courseTitle}
+                  secondary={`${code}${section}`}
+                />
+              </ListItem>
+            );
+          })}
+      </List>
+    </Stack>
   );
 };
 

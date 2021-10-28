@@ -7,18 +7,18 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemSecondaryAction,
+  // ListItemSecondaryAction,
   ListItemText,
   Stack,
-  Tooltip,
+  // Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+// import AddCircleIcon from "@mui/icons-material/AddCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+// import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { useState } from "react";
 import _ from "lodash";
 
@@ -34,11 +34,11 @@ import {
 const MeetingListing = ({
   meeting,
   onClick,
-  timetable,
-  dispatchTimetable,
-  session,
-  section,
-  code,
+  // timetable,
+  // dispatchTimetable,
+  // session,
+  // section,
+  // code,
 }) => {
   const {
     schedule,
@@ -140,7 +140,7 @@ const MeetingListing = ({
         .filter(([k]) => k !== "-")
         .map(([, v]) => formatSessionInfo(v, full)),
       delivery: formatDeliveryMode(deliveryMode, full),
-      priority: getPriorityCodeDescription(enrollmentIndicator),
+      priority: enrollmentIndicator,
       capacity: formatCapacity(
         enrollmentCapacity,
         actualEnrolment,
@@ -158,57 +158,57 @@ const MeetingListing = ({
     onClick(getDataForDialog());
   };
 
-  section = section.toUpperCase();
-  code = code.toUpperCase();
+  // section = section.toUpperCase();
+  // code = code.toUpperCase();
 
-  const isEntryInTimetable = () => {
-    if (
-      !Object.keys(timetable).includes(session) ||
-      !Object.keys(timetable[session]).includes(`${code}${section}`) ||
-      !Object.keys(timetable[session][`${code}${section}`]).includes(
-        teachingMethod
-      )
-    ) {
-      return false;
-    }
-    return (
-      timetable[session][`${code}${section}`][teachingMethod][
-        "sectionNumber"
-      ] === sectionNumber
-    );
-  };
+  // const isEntryInTimetable = () => {
+  //   if (
+  //     !Object.keys(timetable).includes(session) ||
+  //     !Object.keys(timetable[session]).includes(`${code}${section}`) ||
+  //     !Object.keys(timetable[session][`${code}${section}`]).includes(
+  //       teachingMethod
+  //     )
+  //   ) {
+  //     return false;
+  //   }
+  //   return (
+  //     timetable[session][`${code}${section}`][teachingMethod][
+  //       "sectionNumber"
+  //     ] === sectionNumber
+  //   );
+  // };
 
-  const getSecondaryAction = () => {
-    if (cancel) {
-      return (
-        <IconButton disabled>
-          <AddCircleIcon />
-        </IconButton>
-      );
-    }
-    return (
-      <Tooltip
-        placement="left"
-        title={`${!isEntryInTimetable() ? "Add to" : "Remove from"} timetable`}
-      >
-        <IconButton
-          onClick={() =>
-            dispatchTimetable({
-              type: !isEntryInTimetable() ? "add" : "remove",
-              payload: {
-                session,
-                code,
-                section,
-                meeting,
-              },
-            })
-          }
-        >
-          {!isEntryInTimetable() ? <AddCircleIcon /> : <RemoveCircleIcon />}
-        </IconButton>
-      </Tooltip>
-    );
-  };
+  // const getSecondaryAction = () => {
+  //   if (cancel) {
+  //     return (
+  //       <IconButton disabled>
+  //         <AddCircleIcon />
+  //       </IconButton>
+  //     );
+  //   }
+  //   return (
+  //     <Tooltip
+  //       placement="left"
+  //       title={`${!isEntryInTimetable() ? "Add to" : "Remove from"} timetable`}
+  //     >
+  //       <IconButton
+  //         onClick={() =>
+  //           dispatchTimetable({
+  //             type: !isEntryInTimetable() ? "add" : "remove",
+  //             payload: {
+  //               session,
+  //               code,
+  //               section,
+  //               meeting,
+  //             },
+  //           })
+  //         }
+  //       >
+  //         {!isEntryInTimetable() ? <AddCircleIcon /> : <RemoveCircleIcon />}
+  //       </IconButton>
+  //     </Tooltip>
+  //   );
+  // };
 
   return (
     <ListItem disableGutters>
@@ -218,7 +218,7 @@ const MeetingListing = ({
           <ListItemSecondary />
         </Stack>
       </ListItemButton>
-      <ListItemSecondaryAction>{getSecondaryAction()}</ListItemSecondaryAction>
+      {/* <ListItemSecondaryAction>{getSecondaryAction()}</ListItemSecondaryAction> */}
     </ListItem>
   );
 };
@@ -226,10 +226,10 @@ const MeetingListing = ({
 const MeetingListings = ({
   data,
   onListEntryClick,
-  timetable,
-  dispatchTimetable,
+  // timetable,
+  // dispatchTimetable,
   section,
-  session,
+  // session,
   code,
 }) => (
   <List dense>
@@ -239,10 +239,10 @@ const MeetingListings = ({
           meeting={v}
           onClick={onListEntryClick}
           key={k}
-          timetable={timetable}
-          dispatchTimetable={dispatchTimetable}
+          // timetable={timetable}
+          // dispatchTimetable={dispatchTimetable}
           section={section}
-          session={session}
+          // session={session}
           code={code}
         />
       );
@@ -267,22 +267,26 @@ const DialogContent = ({ data }) => {
         <Typography variant="body1">{`Instructors: ${instructors}`}</Typography>
         <Typography variant="body1">{`Delivery mode: ${delivery}`}</Typography>
         <Typography variant="body1">{capacity}</Typography>
-        <Stack>
-          <Typography variant="body1" paragraph>
-            Meetings:
-          </Typography>
-          {meetings.map((entry) => (
-            <Typography variant="body2" key={entry}>
-              {entry}
+        {!_.isEmpty(meetings) ? (
+          <Stack>
+            <Typography variant="body1" paragraph>
+              Meetings:
             </Typography>
-          ))}
-        </Stack>
+            {meetings.map((entry) => (
+              <Typography variant="body2" key={entry}>
+                {entry}
+              </Typography>
+            ))}
+          </Stack>
+        ) : null}
         {priority ? (
           <Stack>
             <Typography variant="body1" paragraph>
-              Enrollment priority:
+              {`Enrollment priority: ${priority}`}
             </Typography>
-            <Typography variant="body2">{priority}</Typography>
+            <Typography variant="body2">
+              {getPriorityCodeDescription(priority)}
+            </Typography>
           </Stack>
         ) : null}
         {!_.isEmpty(priorityGroups) ? (

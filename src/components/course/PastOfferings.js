@@ -7,50 +7,16 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import _ from "lodash";
 
-import { Loader } from "../Loader";
-
-import { fetchPastOfferings as fetch } from "../../utilities/data-scraper";
 import {
   getYearLabel,
   extractInstructorsAndOccupancy,
 } from "../../utilities/courseFormatter";
+import { Loader } from "../Loader";
 
-const PastOfferings = ({ courseCode, currSection, currSession, mobile }) => {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({});
-  const mounted = useRef(true);
-
-  useEffect(() => {
-    const search = async () => {
-      const results = await fetch(courseCode, {
-        session: currSession,
-        section: currSection,
-      });
-      if (mounted.current) {
-        setData(results);
-      }
-    };
-
-    const execute = () => {
-      setLoading(true);
-      search().then(() => {
-        if (mounted.current) {
-          setLoading(false);
-        }
-      });
-    };
-
-    mounted.current = true;
-    execute();
-    return () => {
-      mounted.current = false;
-    };
-  }, [courseCode, currSession, currSection]);
-
+const PastOfferings = ({ data, loading, mobile }) => {
   return (
     <Stack divider={mobile ? null : <Divider />} spacing={mobile ? 0 : 2}>
       <Typography variant="h5" paragraph={mobile}>

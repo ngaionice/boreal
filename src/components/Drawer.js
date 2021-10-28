@@ -14,8 +14,9 @@ import {
 import { Link as RouterLink, useLocation } from "react-router-dom";
 
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import SettingsIcon from "@mui/icons-material/Settings";
+import SearchIcon from "@mui/icons-material/Search";
+// import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+// import SettingsIcon from "@mui/icons-material/Settings";
 
 import { styles } from "../theme";
 
@@ -54,7 +55,12 @@ const ListEntry = ({
 
 const DrawerContent = ({ children, mobileClose }) => (
   <List dense>
-    <ListSubheader id="site-functions">Site functions</ListSubheader>
+    <ListEntry
+      label="Search"
+      icon={<SearchIcon />}
+      to="/search"
+      onClick={mobileClose}
+    />
 
     <ListEntry
       label="Bookmarks"
@@ -62,23 +68,27 @@ const DrawerContent = ({ children, mobileClose }) => (
       to="/bookmarks"
       onClick={mobileClose}
     />
-    <ListEntry
+    {/* <ListEntry
       label="Timetable"
       icon={<CalendarTodayIcon />}
       to="/timetable"
       onClick={mobileClose}
-    />
-    <ListEntry
+    /> */}
+    {/* <ListEntry
       label="Settings"
       icon={<SettingsIcon />}
       to="/settings"
       onClick={mobileClose}
-    />
+    /> */}
 
-    <ListSubheader id="search">Search</ListSubheader>
+    <ListSubheader id="search" sx={{ backgroundColor: "inherit" }}>
+      Quick Search
+    </ListSubheader>
 
     <ListItem disableGutters>
-      <Box padding={2}>{children} </Box>
+      <Box paddingLeft={2} paddingRight={2} paddingBottom={1}>
+        {children}{" "}
+      </Box>
     </ListItem>
   </List>
 );

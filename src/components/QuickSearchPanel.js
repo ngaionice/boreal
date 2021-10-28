@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  Button,
   Divider,
   List,
   ListItem,
@@ -12,24 +11,17 @@ import {
   Typography,
 } from "@mui/material";
 
-import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { Link as RouterLink } from "react-router-dom";
 import _ from "lodash";
 
 import { styles } from "../theme";
 import { Loader } from "./Loader";
 
-const Search = ({
-  fetchedData,
-  setFetchedData,
-  onCourseSelection,
-  onButtonClick,
-}) => {
+const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
   // search
   const [searchTerm, setSearchTerm] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const retrievedOn = useRef(new Date());
 
   // pagination
   const itemsPerPage = 10;
@@ -46,13 +38,14 @@ const Search = ({
     let didCancel = false;
     const search = async () => {
       const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
-      retrievedOn.current = new Date();
+      const retrievedOn = new Date();
       const { data } = await axios.get(url, { headers: {} });
 
+      Object.keys(data).forEach((key) => {
+        data[key]["updated"] = retrievedOn;
+      });
+
       if (!didCancel) {
-        Object.keys(data).forEach((key) => {
-          data[key]["updated"] = retrievedOn.current;
-        });
         setFetchedData(data);
         setNoOfPages(Math.ceil(Object.keys(data).length / itemsPerPage));
       }
@@ -78,11 +71,7 @@ const Search = ({
 
   return (
     <Stack flex={1} spacing={1}>
-      <SearchOptions
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        onButtonClick={onButtonClick}
-      />
+      <SearchOptions searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <Results
         loading={loading}
         data={fetchedData}
@@ -96,7 +85,7 @@ const Search = ({
   );
 };
 
-const SearchOptions = ({ searchTerm, setSearchTerm, onButtonClick }) => {
+const SearchOptions = ({ searchTerm, setSearchTerm }) => {
   return (
     <form noValidate autoComplete="off">
       <Stack spacing={1}>
@@ -112,19 +101,9 @@ const SearchOptions = ({ searchTerm, setSearchTerm, onButtonClick }) => {
           flex={1}
         />
         <Typography variant="caption">
-          Quick search shows courses for the current year. For more options, use
-          advanced search.
+          Quick search shows courses for the current year only. For more
+          options, use the regular search function.
         </Typography>
-        <Button
-          variant="outlined"
-          color="inherit"
-          startIcon={<ManageSearchIcon />}
-          component={RouterLink}
-          to="/search"
-          onClick={onButtonClick}
-        >
-          Advanced Search
-        </Button>
       </Stack>
     </form>
   );

@@ -91,6 +91,8 @@ const formatDeliveryMode = (deliveryMode, full) => {
       return full ? "Online — Synchronous" : "Online Sync";
     case "ONLASYNC":
       return full ? "Online — Asynchronous" : "Online Async";
+    case "ONL":
+      return "Online";
     default:
       return null;
   }
@@ -127,17 +129,17 @@ const formatPriorityGroup = (groupData) => {
 const getPriorityCodeDescription = (code) => {
   switch (code) {
     case "P":
-      return "Priority: Some students are given priority access until a specific date.";
+      return "Some students are given priority access until a specific date.";
     case "E":
-      return "Enrol at Department: Students must contact the sponsoring Department to enrol.";
+      return "Students must contact the sponsoring Department to enrol.";
     case "AE":
-      return "Department Approval Required: Students must request enrolment on ACORN and await Departmental review of their request.";
+      return "Students must request enrolment on ACORN and await Departmental review of their request.";
     case "PE":
-      return "Priority, then Enrol at Department: Some students are given priority access until a specific date, after which time another group of students is also able to enrol by contacting the sponsoring Department.";
+      return "Some students are given priority access until a specific date, after which time another group of students is also able to enrol by contacting the sponsoring Department.";
     case "R1":
-      return "Restricted: Course/section is restricted at all times for specific students.";
+      return "Course/section is restricted at all times for specific students.";
     case "R2":
-      return "Restricted: Course/section is restricted to a group of students until a specific date, after which time another group of students is also able to enrol.";
+      return "Course/section is restricted to a group of students until a specific date, after which time another group of students is also able to enrol.";
     default:
       return "";
   }

@@ -113,7 +113,6 @@ const App = () => {
             fetchedData={currFetchedData}
             setFetchedData={setCurrFetchedData}
             onCourseSelection={onQuickPanelCourseSelection}
-            onButtonClick={() => setIsNavExpanded(!isNavExpanded)}
           />
         </Drawer>
 
