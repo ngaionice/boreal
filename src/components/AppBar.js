@@ -19,7 +19,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { styles } from "../theme";
 import { cloneElement, useEffect, useState } from "react";
 import { getCourseId } from "../utilities/misc";
-import { fetchAndSetDisplayedData } from "../utilities/fetcher";
+import { fetchCourseData } from "../utilities/fetcher";
 import { useLocation } from "react-router-dom";
 
 const ElevationScroll = (props) => {
@@ -101,10 +101,20 @@ const AppBar = ({
       let mounted = true;
       if (loading) {
         const { session, section, code } = currDisplayedData;
-        fetchAndSetDisplayedData(
-          [session, section, code],
-          setCurrDisplayedData
-        ).then(() => {
+        fetchCourseData([session, section, code]).then((data) => {
+          setCurrDisplayedData(data);
+          const currDisplayedId = `${code}-${section}-${session}`;
+          if (
+            data &&
+            favorites.hasOwnProperty(currDisplayedId) &&
+            favorites[currDisplayedId]["updated"] < data["updated"]
+          ) {
+            dispatchFavorites({
+              type: "add",
+              courseId: currDisplayedId,
+              payload: data,
+            });
+          }
           if (mounted) {
             setLoading(false);
           }

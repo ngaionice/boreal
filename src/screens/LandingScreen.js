@@ -28,7 +28,7 @@ const LandingScreen = () => {
 
         <Grid item paddingBottom={2}>
           <Typography variant="body1" sx={{ fontFamily: "Quicksand" }}>
-            A course finder for UofT Arts & Science.
+            An improved course finder.
           </Typography>
         </Grid>
 

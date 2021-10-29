@@ -24,16 +24,17 @@ import { Loader } from "../components/Loader";
 import { PastOfferings } from "../components/course/PastOfferings";
 
 import { formatDate } from "../utilities/courseFormatter";
-import { fetchAndSetDisplayedData } from "../utilities/fetcher";
-import { fetchPastOfferings as fetchHistoricalData } from "../utilities/data-scraper";
+import {
+  fetchCourseData,
+  fetchPastOfferings as fetchHistoricalData,
+} from "../utilities/fetcher";
 
 const CourseScreen = ({
   currDisplayedData,
   setCurrDisplayedData,
   currFetchedData,
   favorites,
-  timetable,
-  dispatchTimetable,
+  dispatchFavorites,
 }) => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -50,6 +51,7 @@ const CourseScreen = ({
   // 2) if online: fetch from api
   // then push to curr displayed data
   useEffect(() => {
+    let mounted = true;
     if (location.pathname === pathname.current) {
       setLoading(false);
       setLoadingHistorical(false);
@@ -69,16 +71,35 @@ const CourseScreen = ({
         const [session, section, code] = pathData;
         const currDisplayedId = `${code}-${section}-${session}`;
 
-        if (currFetchedData.hasOwnProperty(currDisplayedId)) {
-          setCurrDisplayedData(currFetchedData[currDisplayedId]);
-        } else if (online.current) {
-          await fetchAndSetDisplayedData(pathData, setCurrDisplayedData);
-        } else {
+        if (!online.current) {
           if (favorites.hasOwnProperty(currDisplayedId)) {
             setCurrDisplayedData(favorites[currDisplayedId]);
           } else {
             throw new Error("Offline and not favorited.");
           }
+        }
+
+        let data = {};
+        if (currFetchedData.hasOwnProperty(currDisplayedId)) {
+          data = currFetchedData[currDisplayedId];
+        } else if (online.current) {
+          data = await fetchCourseData(pathData);
+        }
+
+        if (mounted) {
+          setCurrDisplayedData(data);
+        }
+
+        // update the saved favorites data instance to the latest version possible
+        if (
+          favorites.hasOwnProperty(currDisplayedId) &&
+          favorites[currDisplayedId]["updated"] < data["updated"]
+        ) {
+          dispatchFavorites({
+            type: "add",
+            courseId: currDisplayedId,
+            payload: data,
+          });
         }
         return [session, section, code];
       }
@@ -89,7 +110,9 @@ const CourseScreen = ({
         session,
         section,
       });
-      setHistoricalData(results);
+      if (mounted) {
+        setHistoricalData(results);
+      }
     };
 
     setCurrentData()
@@ -106,8 +129,15 @@ const CourseScreen = ({
     return () => {
       setLoading(true);
       setLoadingHistorical(true);
+      mounted = false;
     };
-  }, [location, setCurrDisplayedData, currFetchedData, favorites]);
+  }, [
+    location,
+    setCurrDisplayedData,
+    currFetchedData,
+    favorites,
+    dispatchFavorites,
+  ]);
 
   if (loading) {
     return <Loader />;
@@ -174,8 +204,6 @@ const CourseScreen = ({
             })}
             <Meetings
               data={meetings}
-              timetable={timetable}
-              dispatchTimetable={dispatchTimetable}
               section={section}
               session={session}
               code={code}

@@ -32,6 +32,7 @@ const Switchboard = ({
             setCurrDisplayedData={setCurrDisplayedData}
             currFetchedData={currFetchedData}
             favorites={favorites}
+            dispatchFavorites={dispatchFavorites}
           />
         </Route>
 

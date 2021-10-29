@@ -246,14 +246,7 @@ const DialogContent = ({ data }) => {
   );
 };
 
-const CourseMeetings = ({
-  data,
-  timetable,
-  dispatchTimetable,
-  section,
-  session,
-  code,
-}) => {
+const CourseMeetings = ({ data, section, session, code }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState({
     section: "",
@@ -282,8 +275,6 @@ const CourseMeetings = ({
       <MeetingListings
         data={data}
         onListEntryClick={entryClick}
-        timetable={timetable}
-        dispatchTimetable={dispatchTimetable}
         section={section}
         session={session}
         code={code}
