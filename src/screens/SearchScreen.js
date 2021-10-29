@@ -42,13 +42,36 @@ import {
 } from "../utilities/searchOptions";
 import { getSearchInstance } from "../utilities/fetcher";
 import { Loader } from "../components/Loader";
+import { extractInstructorsAndOccupancy } from "../utilities/courseFormatter";
+
+const defaultSearchState = {
+  title: "",
+  courseCode: "",
+  sections: [],
+  departments: [],
+  levels: [],
+  lastName: "",
+  days: [],
+  times: [],
+  breadths: [],
+  year: _.last(years),
+  modes: [],
+  online: false,
+  hasSpace: false,
+  waitlist: false,
+  fyf: false,
+  allowModes: true,
+};
 
 const SearchScreen = ({
   currFetchedData,
   setCurrFetchedData,
   setCurrDisplayedData,
+  searchFields,
+  setSearchFields,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
   return (
     <Container maxWidth="lg">
@@ -57,11 +80,15 @@ const SearchScreen = ({
         <SearchOptions
           setCurrFetchedData={setCurrFetchedData}
           setLoading={setLoading}
+          searchFields={searchFields}
+          setSearchFields={setSearchFields}
+          setSearched={setSearched}
         />
         <SearchResults
           currFetchedData={currFetchedData}
           setCurrDisplayedData={setCurrDisplayedData}
           loading={loading}
+          searched={searched}
         />
       </Stack>
     </Container>
@@ -74,13 +101,18 @@ const ExpandMore = styled((props) => {
 })(({ theme, expand }) => ({
   transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
   marginLeft: "auto",
-  // marginRight: "auto",
   transition: theme.transitions.create("transform", {
     duration: theme.transitions.duration.shortest,
   }),
 }));
 
-const SearchOptions = ({ setCurrFetchedData, setLoading }) => {
+const SearchOptions = ({
+  setCurrFetchedData,
+  setLoading,
+  searchFields,
+  setSearchFields,
+  setSearched,
+}) => {
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => setExpanded(!expanded);
   const mounted = useRef(true);
@@ -110,14 +142,33 @@ const SearchOptions = ({ setCurrFetchedData, setLoading }) => {
     };
   });
 
+  useEffect(() => {
+    setTitle(searchFields.title);
+    setCourseCode(searchFields.courseCode);
+    setSections(searchFields.sections);
+    setDepartments(searchFields.departments);
+    setLevels(searchFields.levels);
+    setLastName(searchFields.lastName);
+    setDays(searchFields.days);
+    setTimes(searchFields.times);
+    setBreadths(searchFields.breadths);
+    setYear(searchFields.year);
+    setModes(searchFields.modes);
+    setOnline(searchFields.online);
+    setHasSpace(searchFields.hasSpace);
+    setWaitlist(searchFields.waitlist);
+    setFyf(searchFields.fyf);
+  }, [searchFields]);
+
   const search = () => {
     setLoading(true);
+    setSearched(true);
     const instance = getSearchInstance();
     const retrievedOn = new Date();
 
     const format = (param) => {
       if (typeof param === "boolean") {
-        return param ? "T" : null;
+        return param ? "t" : null;
       }
       if (typeof param === "string") {
         return param ? param : null;
@@ -158,25 +209,31 @@ const SearchOptions = ({ setCurrFetchedData, setLoading }) => {
           setCurrFetchedData(data);
         }
       })
-      .then(() => setLoading(false));
+      .then(() => {
+        setLoading(false);
+        setSearchFields({
+          title,
+          courseCode,
+          sections,
+          departments,
+          levels,
+          lastName,
+          days,
+          times,
+          breadths,
+          year,
+          modes,
+          online,
+          hasSpace,
+          waitlist,
+          fyf,
+        });
+      });
   };
 
   const clear = () => {
-    setTitle("");
-    setCourseCode("");
-    setSections([]);
-    setDepartments([]);
-    setLevels([]);
-    setLastName("");
-    setDays([]);
-    setTimes([]);
-    setBreadths([]);
-    setYear(_.last(years));
-    setModes([]);
-    setOnline(false);
-    setHasSpace(false);
-    setWaitlist(false);
-    setFyf(false);
+    setSearchFields(defaultSearchState);
+    setSearched(false);
   };
 
   return (
@@ -408,7 +465,12 @@ const SearchOptions = ({ setCurrFetchedData, setLoading }) => {
   );
 };
 
-const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
+const SearchResults = ({
+  currFetchedData,
+  setCurrDisplayedData,
+  loading,
+  searched,
+}) => {
   const [page, setPage] = useState(1);
   const [noOfPages, setNoOfPages] = useState(1);
   const itemsPerPage = 10;
@@ -426,12 +488,20 @@ const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
     return <Loader />;
   }
 
-  if (_.isEmpty(currFetchedData)) {
+  if (!searched) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
         <Typography variant="body1">
           Configure your options above, then hit search!
         </Typography>
+      </Box>
+    );
+  }
+
+  if (_.isEmpty(currFetchedData)) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Typography variant="body1">No results found.</Typography>
       </Box>
     );
   }
@@ -445,12 +515,12 @@ const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
           onChange={(e, v) => setPage(v)}
         />
       </Box>
-      <List dense>
+      <List>
         {Object.keys(currFetchedData)
           .slice((page - 1) * itemsPerPage, page * itemsPerPage)
           .map((key) => {
             const result = currFetchedData[key];
-            const { courseTitle, code, section, session } = result;
+            const { courseTitle, code, section, session, meetings } = result;
             return (
               <ListItem
                 button
@@ -459,10 +529,14 @@ const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
                 component={RouterLink}
                 to={`/course/${session}/${section.toLowerCase()}/${code.toLowerCase()}`}
               >
-                <ListItemText
-                  primary={courseTitle}
-                  secondary={`${code}${section}`}
-                />
+                <Stack>
+                  <ListItemText primary={courseTitle} />
+                  <ListItemSecondary
+                    code={code}
+                    section={section}
+                    meetings={meetings}
+                  />
+                </Stack>
               </ListItem>
             );
           })}
@@ -471,4 +545,21 @@ const SearchResults = ({ currFetchedData, setCurrDisplayedData, loading }) => {
   );
 };
 
-export { SearchScreen };
+const ListItemSecondary = ({ code, section, meetings }) => {
+  const instructors = extractInstructorsAndOccupancy(meetings)[0];
+
+  return (
+    <Stack
+      spacing={1}
+      direction="row"
+      divider={<Divider orientation="vertical" flexItem />}
+    >
+      <Typography variant="body2">{`${code}${section}`}</Typography>
+      <Typography variant="body2">
+        {instructors ? instructors : "TBA"}
+      </Typography>
+    </Stack>
+  );
+};
+
+export { SearchScreen, defaultSearchState };

@@ -1,22 +1,23 @@
+import { Box, Toolbar } from "@mui/material";
+import { useState } from "react";
 import { Route, Switch } from "react-router-dom";
+
 import { CourseScreen } from "./screens/CourseScreen";
 import { FavoritesScreen } from "./screens/FavoritesScreen";
-// import { TimetableScreen } from "./screens/TimetableScreen";
 import { LandingScreen } from "./screens/LandingScreen";
-import { Box, Toolbar } from "@mui/material";
-import { SearchScreen } from "./screens/SearchScreen";
+import { defaultSearchState, SearchScreen } from "./screens/SearchScreen";
 
 const Switchboard = ({
   favorites,
   dispatchFavorites,
   currFetchedData,
-  setCurrFetchedData,
   currDisplayedData,
   setCurrDisplayedData,
-  // timetable,
-  // dispatchTimetable,
   sv,
 }) => {
+  const [searchFields, setSearchFields] = useState(defaultSearchState);
+  const [searchResults, setSearchResults] = useState({});
+
   return (
     <Switch>
       <Route path="/" exact>
@@ -31,8 +32,6 @@ const Switchboard = ({
             setCurrDisplayedData={setCurrDisplayedData}
             currFetchedData={currFetchedData}
             favorites={favorites}
-            // timetable={timetable}
-            // dispatchTimetable={dispatchTimetable}
           />
         </Route>
 
@@ -43,18 +42,13 @@ const Switchboard = ({
           />
         </Route>
 
-        {/* <Route path="/timetable">
-          <TimetableScreen
-            timetable={timetable}
-            dispatchTimetable={dispatchTimetable}
-          />
-        </Route> */}
-
         <Route path="/search">
           <SearchScreen
-            currFetchedData={currFetchedData}
-            setCurrFetchedData={setCurrFetchedData}
+            currFetchedData={searchResults}
+            setCurrFetchedData={setSearchResults}
             setCurrDisplayedData={setCurrDisplayedData}
+            searchFields={searchFields}
+            setSearchFields={setSearchFields}
           />
         </Route>
       </Box>

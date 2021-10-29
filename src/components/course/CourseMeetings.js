@@ -7,18 +7,14 @@ import {
   List,
   ListItem,
   ListItemButton,
-  // ListItemSecondaryAction,
   ListItemText,
   Stack,
-  // Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 
-// import AddCircleIcon from "@mui/icons-material/AddCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-// import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { useState } from "react";
 import _ from "lodash";
 
@@ -31,15 +27,7 @@ import {
   getPriorityCodeDescription,
 } from "../../utilities/courseFormatter";
 
-const MeetingListing = ({
-  meeting,
-  onClick,
-  // timetable,
-  // dispatchTimetable,
-  // session,
-  // section,
-  // code,
-}) => {
+const MeetingListing = ({ meeting, onClick }) => {
   const {
     schedule,
     instructors,
@@ -158,58 +146,6 @@ const MeetingListing = ({
     onClick(getDataForDialog());
   };
 
-  // section = section.toUpperCase();
-  // code = code.toUpperCase();
-
-  // const isEntryInTimetable = () => {
-  //   if (
-  //     !Object.keys(timetable).includes(session) ||
-  //     !Object.keys(timetable[session]).includes(`${code}${section}`) ||
-  //     !Object.keys(timetable[session][`${code}${section}`]).includes(
-  //       teachingMethod
-  //     )
-  //   ) {
-  //     return false;
-  //   }
-  //   return (
-  //     timetable[session][`${code}${section}`][teachingMethod][
-  //       "sectionNumber"
-  //     ] === sectionNumber
-  //   );
-  // };
-
-  // const getSecondaryAction = () => {
-  //   if (cancel) {
-  //     return (
-  //       <IconButton disabled>
-  //         <AddCircleIcon />
-  //       </IconButton>
-  //     );
-  //   }
-  //   return (
-  //     <Tooltip
-  //       placement="left"
-  //       title={`${!isEntryInTimetable() ? "Add to" : "Remove from"} timetable`}
-  //     >
-  //       <IconButton
-  //         onClick={() =>
-  //           dispatchTimetable({
-  //             type: !isEntryInTimetable() ? "add" : "remove",
-  //             payload: {
-  //               session,
-  //               code,
-  //               section,
-  //               meeting,
-  //             },
-  //           })
-  //         }
-  //       >
-  //         {!isEntryInTimetable() ? <AddCircleIcon /> : <RemoveCircleIcon />}
-  //       </IconButton>
-  //     </Tooltip>
-  //   );
-  // };
-
   return (
     <ListItem disableGutters>
       <ListItemButton onClick={onItemClick} disabled={Boolean(cancel)}>
@@ -218,20 +154,11 @@ const MeetingListing = ({
           <ListItemSecondary />
         </Stack>
       </ListItemButton>
-      {/* <ListItemSecondaryAction>{getSecondaryAction()}</ListItemSecondaryAction> */}
     </ListItem>
   );
 };
 
-const MeetingListings = ({
-  data,
-  onListEntryClick,
-  // timetable,
-  // dispatchTimetable,
-  section,
-  // session,
-  code,
-}) => (
+const MeetingListings = ({ data, onListEntryClick, section, code }) => (
   <List dense>
     {Object.entries(data).map(([k, v]) => {
       return (
@@ -239,10 +166,7 @@ const MeetingListings = ({
           meeting={v}
           onClick={onListEntryClick}
           key={k}
-          // timetable={timetable}
-          // dispatchTimetable={dispatchTimetable}
           section={section}
-          // session={session}
           code={code}
         />
       );

@@ -22,6 +22,7 @@ const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
   // pagination
   const itemsPerPage = 10;
@@ -53,6 +54,7 @@ const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
 
     const execute = () => {
       setLoading(true);
+      setSearched(true);
       setPage(1);
       search().then(() => setLoading(false));
     };
@@ -71,7 +73,11 @@ const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
 
   return (
     <Stack flex={1} spacing={1}>
-      <SearchOptions searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <SearchOptions
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        setSearched={setSearched}
+      />
       <Results
         loading={loading}
         data={fetchedData}
@@ -79,13 +85,13 @@ const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
         pageControl={[page, setPage]}
         noOfPages={noOfPages}
         itemsPerPage={itemsPerPage}
-        searchTerm={searchTerm}
+        searched={searched}
       />
     </Stack>
   );
 };
 
-const SearchOptions = ({ searchTerm, setSearchTerm }) => {
+const SearchOptions = ({ searchTerm, setSearchTerm, setSearched }) => {
   return (
     <form noValidate autoComplete="off">
       <Stack spacing={1}>
@@ -95,7 +101,12 @@ const SearchOptions = ({ searchTerm, setSearchTerm }) => {
           variant="outlined"
           placeholder="Quick search"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
+          onChange={(e) => {
+            if (!e.target.value) {
+              setSearched(false);
+            }
+            setSearchTerm(e.target.value.toUpperCase());
+          }}
           fullWidth
           size="small"
           flex={1}
@@ -111,19 +122,19 @@ const SearchOptions = ({ searchTerm, setSearchTerm }) => {
 
 const Results = ({
   loading,
+  searched,
   data,
   onCourseClick,
   pageControl,
   itemsPerPage,
   noOfPages,
-  searchTerm,
 }) => {
   // only show results if not loading, search term is not empty, and there are actually results
   if (loading) {
     return <Loader />;
   }
 
-  if (!searchTerm) {
+  if (!searched) {
     return (
       <Stack spacing={1} justifyContent="center" alignItems="center">
         <Divider flexItem />

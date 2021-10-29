@@ -14,21 +14,11 @@ import { Drawer } from "./components/Drawer";
 import { AppBar } from "./components/AppBar";
 import { Switchboard } from "./Switchboard";
 import { getPageTitle } from "./utilities/misc";
-import {
-  timetableReducer,
-  favoritesReducer,
-  favoritesKey,
-  timetablesKey,
-} from "./reducers";
+import { favoritesReducer, favoritesKey } from "./reducers";
 
 const loadExistingFavorites = (favoritesKey) => {
   const existingFavorites = localStorage.getItem(favoritesKey);
   return existingFavorites ? JSON.parse(existingFavorites) : {};
-};
-
-const loadExistingTimetable = (timetablesKey) => {
-  const existingTimetables = localStorage.getItem(timetablesKey);
-  return existingTimetables ? JSON.parse(existingTimetables) : {};
 };
 
 const App = () => {
@@ -49,11 +39,6 @@ const App = () => {
     loadExistingFavorites(favoritesKey)
   );
 
-  const [timetable, dispatchTimetable] = useReducer(
-    timetableReducer,
-    loadExistingTimetable(timetablesKey)
-  );
-
   // initial setup
   useEffect(() => {
     const monitorCrossTabState = (e) => {
@@ -61,8 +46,6 @@ const App = () => {
         setDark(e.newValue === "dark");
       } else if (e.key === favoritesKey) {
         dispatchFavorites({ type: "reset", payload: JSON.parse(e.newValue) });
-      } else if (e.key === timetablesKey) {
-        dispatchTimetable({ type: "reset", payload: JSON.parse(e.newValue) });
       }
     };
 
@@ -119,10 +102,7 @@ const App = () => {
         <Switchboard
           favorites={favorites}
           dispatchFavorites={dispatchFavorites}
-          timetable={timetable}
-          dispatchTimetable={dispatchTimetable}
           currFetchedData={currFetchedData}
-          setCurrFetchedData={setCurrFetchedData}
           currDisplayedData={currDisplayedData}
           setCurrDisplayedData={setCurrDisplayedData}
           sv={mobile ? sv.contentMobileWrapper : sv.contentWrapper}
