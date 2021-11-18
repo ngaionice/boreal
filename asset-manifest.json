@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/boreal/static/js/main.c6fb2294.chunk.js",
-    "main.js.map": "/boreal/static/js/main.c6fb2294.chunk.js.map",
+    "main.js": "/boreal/static/js/main.23ccd2d3.chunk.js",
+    "main.js.map": "/boreal/static/js/main.23ccd2d3.chunk.js.map",
     "runtime-main.js": "/boreal/static/js/runtime-main.4afd85df.js",
     "runtime-main.js.map": "/boreal/static/js/runtime-main.4afd85df.js.map",
     "static/js/2.8c202e15.chunk.js": "/boreal/static/js/2.8c202e15.chunk.js",
@@ -12,6 +12,6 @@
   "entrypoints": [
     "static/js/runtime-main.4afd85df.js",
     "static/js/2.8c202e15.chunk.js",
-    "static/js/main.c6fb2294.chunk.js"
+    "static/js/main.23ccd2d3.chunk.js"
   ]
 }
