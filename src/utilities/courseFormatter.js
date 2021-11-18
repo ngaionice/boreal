@@ -114,7 +114,6 @@ const formatPriorityGroup = (groupData) => {
 
   const year =
     !yearOfStudy || yearOfStudy === "*" ? "" : `Year ${yearOfStudy} `;
-  const faculty = primaryOrgName ? primaryOrgName + ": " : "";
   const dept = adminOrgName
     ? adminOrgName
     : secondaryOrgName
@@ -122,6 +121,9 @@ const formatPriorityGroup = (groupData) => {
     : "";
 
   const college = assocOrgName ? assocOrgName : "";
+  const faculty = primaryOrgName
+    ? primaryOrgName + (year + (dept ? dept : college) ? ": " : "")
+    : "";
 
   return group + faculty + year + (dept ? dept : college);
 };
