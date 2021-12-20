@@ -205,8 +205,146 @@ const sections = [
   },
 ];
 
-// TODO: add in department data
-const departments = [];
+const departments = [
+  { value: "CSUS", label: "American Studies (AMS) (USA)" },
+  { value: "ANA", label: "Anatomy (ANA)" },
+  {
+    value: "ANT",
+    label: "Anthropology (ANT) (ARH) (HAJ) (JAH) (JAL) (JAR) (JGA)",
+  },
+  {
+    value: "ARCLA",
+    label: "Architecture, Landscape & Design, Faculty of (FOR) (ARC)",
+  },
+  { value: "FAR", label: "Art History (FAH)" },
+  { value: "AST", label: "Astronomy & Astrophysics (AST) (JCA) (PLN)" },
+  { value: "BCH", label: "Biochemistry (BCH)" },
+  {
+    value: "CITA",
+    label: "Canadian Institute for Theoretical Astrophysics (CTA)",
+  },
+  { value: "CSB", label: "Cell and Systems Biology (CSB) (BCB) (BIO) (CJH)" },
+  { value: "CHM", label: "Chemistry (CHM) (JCC) (JSC) (NUS) (PHC)" },
+  { value: "CINE", label: "Cinema Studies (CIN)" },
+  { value: "CLAS", label: "Classics (CLA) (GRK) (LAT)" },
+  { value: "COL", label: "Comparative Literature (COL) (JDC)" },
+  { value: "CSC", label: "Computer Science (CSC) (COG) (ECE) (JCC) (JSC)" },
+  { value: "OISUT", label: "Concurrent Teacher Education Program (EDU)" },
+  { value: "ASI", label: "Contemporary Asian Studies (CAS) (JHA) (JPA) (SAS)" },
+  {
+    value: "CRIM",
+    label: "Criminology and Sociolegal Studies, Centre for (CRI)",
+  },
+  { value: "DTS", label: "Diaspora and Transnational Studies (DTS)" },
+  {
+    value: "DRAMA",
+    label:
+      "Drama, Theatre and Performance Studies, Centre for (DRM) (JDC) (JIA)",
+  },
+  {
+    value: "ES",
+    label: "Earth Sciences (ESS) (JEG) (JGA) (ENV) (JEE) (JPA) (JPE)",
+  },
+  { value: "EAS", label: "East Asian Studies (EAS)" },
+  {
+    value: "EEB",
+    label:
+      "Ecology & Evolutionary Biology (EEB) (BIO) (EHJ) (ENV) (JMB) (JHE) (NUS)",
+  },
+  { value: "ECO", label: "Economics (ECO)" },
+  { value: "ENG", label: "English (ENG) (JEI) (JWE)" },
+  { value: "ENT", label: "Entrepreneurship, Centre for (IMC) (ENT)" },
+  { value: "ENVMT", label: "Environment, School of (ENV) (JEE) (JEH) (JGE)" },
+  { value: "ETHIC", label: "Ethics, Centre for (ETH)" },
+  { value: "CERES", label: "European Studies (EUR) (HUN) (MGR) (JRA)" },
+  { value: "FRE", label: "French (FRE) (FCS) (FSL) (JFG) (JFL) (JFV)" },
+  {
+    value: "GGR",
+    label: "Geography (GGR) (JFG) (JFE) (JGE) (JGI) (JUG) (JEG) (JGU) (JIG)",
+  },
+  { value: "GER", label: "German (GER) (JFG) (JGJ)" },
+  { value: "HIS", label: "History (HIS) (JHA) (JHP) (JHN) (JSH) (JAH)" },
+  {
+    value: "IHPST",
+    label: "History and Philosophy of Science and Technology (HPS) (JHE) (JPH)",
+  },
+  {
+    value: "HMB",
+    label: "Human Biology (HMB) (CJH) (HAJ) (JEH) (EHJ) (JHA) (JNH)",
+  },
+  { value: "IMM", label: "Immunology (IMM) (MIJ)" },
+  { value: "ASABS", label: "Indigenous Studies (INS) (JFP) (JIG) (JPI)" },
+  {
+    value: "IRE",
+    label: "Industrial Relations and Human Resources, Centre for (IRE)",
+  },
+  {
+    value: "INNIS",
+    label: "Innis College (INI) (JGI) (JEI) (JGU) (JWE) (URB) (WRR)",
+  },
+  { value: "ITA", label: "Italian (ITA) (JCI)" },
+  { value: "JSP", label: "Jewish Studies, Centre for (CJS) (JGJ)" },
+  { value: "LMP", label: "Laboratory Medicine and Pathobiology (LMP)" },
+  { value: "LIN", label: "Linguistics (LIN) (JLP) (JLS) (JAL) (JFL) (ARH)" },
+  { value: "MAT", label: "Mathematics (MAT) (APM) (JMB) (JUM)" },
+  { value: "MST", label: "Medieval Studies, Centre for (MST)" },
+  { value: "MEDGM", label: "Molecular Genetics and Microbiology (MGY) (MIJ)" },
+  { value: "MUSIC", label: "Music (MUS)" },
+  { value: "NMC", label: "Near & Middle Eastern Civilizations (NMC) (NML)" },
+  {
+    value: "NEW",
+    label:
+      "New College (NEW) (AFR) (BPM) (CAR) (CSE) (ELL) (IFP) (JHN) (JLN) (JNH) (JNR) (JNS) (JQR) (UTP)",
+  },
+  { value: "NUSCI", label: "Nutritional Sciences (NFS)" },
+  {
+    value: "GLAF",
+    label: "Peace, Conflict and Justice Studies (PCJ) (MUN) (PPG)",
+  },
+  { value: "PCL", label: "Pharmacology (PCL) (JPM)" },
+  { value: "PHL", label: "Philosophy (PHL)" },
+  { value: "PHY", label: "Physics (PHY) (ENV) (JPE) (JPH) (JPA) (JOP) (IVP)" },
+  { value: "PSL", label: "Physiology (PSL) (JPM)" },
+  {
+    value: "POL",
+    label:
+      "Political Science (POL) (JHP) (JPA) (JPD) (JPF) (JPI) (JPP) (JPR) (JPS) (JPU) (JRA)",
+  },
+  { value: "PSY", label: "Psychology (PSY) (JLP)" },
+  { value: "RLG", label: "Religion (RLG) (MHB) (JAR) (JNR) (JPR) (JSR)" },
+  { value: "COMPG", label: "Rotman Commerce (RSM) (MGT)" },
+  {
+    value: "SDST",
+    label:
+      "Sexual Diversity Studies, Mark S. Bonham Centre (SDS) (JNS) (JPS) (JPU) (JSU)",
+  },
+  {
+    value: "SLA",
+    label: "Slavic Languages and Literature (SLA) (EST) (FIN) (JSH) (SWE)",
+  },
+  { value: "SWK", label: "Social Work (SWK)" },
+  { value: "SOC", label: "Sociology (SOC)" },
+  { value: "SAS", label: "South Asian Studies (SAS)" },
+  { value: "SPA", label: "Spanish (SPA) (PRT) (LAS)" },
+  {
+    value: "SMC",
+    label: "St. Michael's College (SMC) (BMS) (CHC) (CLT) (JCA) (MST)",
+  },
+  { value: "STAT", label: "Statistical Sciences (STA) (ACT) (JSC)" },
+  { value: "TRIN", label: "Trinity College (TRN)" },
+  {
+    value: "UC",
+    label:
+      "University College (UNI) (CDN) (COG) (HST) (JCI) (JSU) (JUG) (JUM) (PHS)",
+  },
+  {
+    value: "VIC",
+    label:
+      "Victoria College (VIC) (CRE) (EDS) (IVP) (JSV) (JFV) (LCT) (MCS) (REN)",
+  },
+  { value: "WGSI", label: "Women and Gender Studies (WGS)" },
+  { value: "WDW", label: "Woodsworth College (WDW) (ABP) (DHU)" },
+];
 
 export {
   years,

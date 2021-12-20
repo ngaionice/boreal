@@ -278,6 +278,10 @@ const SearchOptions = ({
               renderInput={(params) => (
                 <TextField {...params} label="Offering department(s)" />
               )}
+              onChange={(e, nv) => {
+                setDepartments(nv);
+                console.log(nv);
+              }}
             />
           </Grid>
         </Grid>
@@ -359,6 +363,7 @@ const SearchOptions = ({
                 )}
                 value={year}
                 onChange={(e, nv) => setYear(nv)}
+                isOptionEqualToValue={(o, v) => o.value === v.value}
               />
             </Grid>
             <Grid item xs={12} lg={6}>
