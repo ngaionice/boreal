@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.js": "/boreal/static/js/main.1324b3ef.chunk.js",
-    "main.js.map": "/boreal/static/js/main.1324b3ef.chunk.js.map",
-    "runtime-main.js": "/boreal/static/js/runtime-main.4afd85df.js",
-    "runtime-main.js.map": "/boreal/static/js/runtime-main.4afd85df.js.map",
-    "static/js/2.8c202e15.chunk.js": "/boreal/static/js/2.8c202e15.chunk.js",
-    "static/js/2.8c202e15.chunk.js.map": "/boreal/static/js/2.8c202e15.chunk.js.map",
-    "index.html": "/boreal/index.html",
-    "static/js/2.8c202e15.chunk.js.LICENSE.txt": "/boreal/static/js/2.8c202e15.chunk.js.LICENSE.txt"
+    "main.js": "/boreal-v1/static/js/main.1324b3ef.chunk.js",
+    "main.js.map": "/boreal-v1/static/js/main.1324b3ef.chunk.js.map",
+    "runtime-main.js": "/boreal-v1/static/js/runtime-main.e97122c3.js",
+    "runtime-main.js.map": "/boreal-v1/static/js/runtime-main.e97122c3.js.map",
+    "static/js/2.8c202e15.chunk.js": "/boreal-v1/static/js/2.8c202e15.chunk.js",
+    "static/js/2.8c202e15.chunk.js.map": "/boreal-v1/static/js/2.8c202e15.chunk.js.map",
+    "index.html": "/boreal-v1/index.html",
+    "static/js/2.8c202e15.chunk.js.LICENSE.txt": "/boreal-v1/static/js/2.8c202e15.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.4afd85df.js",
+    "static/js/runtime-main.e97122c3.js",
     "static/js/2.8c202e15.chunk.js",
     "static/js/main.1324b3ef.chunk.js"
   ]
