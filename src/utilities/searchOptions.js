@@ -54,6 +54,11 @@ const years = [
     label: "'21 Fall - '22 Winter",
     short_label: "'21-'22 FW",
   },
+  {
+    value: "20225",
+    label: "'22 Summer",
+    short_label: "'22 S",
+  },
 ];
 
 const sessions = [
@@ -68,6 +73,7 @@ const sessions = [
   "20209",
   "20215",
   "20219",
+  "20225",
 ];
 
 const instances = sessions.flatMap((v) => [

@@ -112,7 +112,7 @@ const SearchOptions = ({ searchTerm, setSearchTerm, setSearched }) => {
           flex={1}
         />
         <Typography variant="caption">
-          Quick search shows courses for the current year only. For more
+          Quick search shows courses for the latest timetable only. For more
           options, use the regular search function.
         </Typography>
       </Stack>
