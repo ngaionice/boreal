@@ -86,6 +86,7 @@ const formatCapacity = (capacity, enrollment, waitlist, waitlistable, full) => {
 const formatDeliveryMode = (deliveryMode, full) => {
   switch (deliveryMode) {
     case "CLASS":
+    case "INPER":
       return "In person";
     case "ONLSYNC":
       return full ? "Online — Synchronous" : "Online Sync";

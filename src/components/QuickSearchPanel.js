@@ -16,6 +16,7 @@ import _ from "lodash";
 
 import { styles } from "../theme";
 import { Loader } from "./Loader";
+import { years } from "../utilities/searchOptions.js";
 
 const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
   // search
@@ -38,7 +39,9 @@ const Search = ({ fetchedData, setFetchedData, onCourseSelection }) => {
   useEffect(() => {
     let didCancel = false;
     const search = async () => {
-      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/20219/courses?code=${searchTerm}`;
+      const url = `https://ionice.herokuapp.com/https://timetable.iit.artsci.utoronto.ca/api/${
+        years.slice(-1)[0]["value"]
+      }/courses?code=${searchTerm}`;
       const retrievedOn = new Date();
       const { data } = await axios.get(url, { headers: {} });
 

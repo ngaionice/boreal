@@ -194,6 +194,10 @@ const deliveryModes = [
     value: "CLASS",
     label: "In-person",
   },
+  {
+    value: "INPER",
+    label: "In-person",
+  },
 ];
 
 const sections = [
