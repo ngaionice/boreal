@@ -69,6 +69,9 @@ const styles = () => {
       width: { md: `calc(100% - ${drawerWidth}px)` },
       ml: { md: `${drawerWidth}px` },
     },
+    appBarHome: {
+      width: "100%",
+    },
     menuButton: {
       marginRight: 2,
       display: {
