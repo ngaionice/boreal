@@ -172,7 +172,10 @@ const AppBar = ({
 
   return (
     <ElevationScroll>
-      <MuiAppBar position="fixed" sx={classes.appBar}>
+      <MuiAppBar
+        position="fixed"
+        sx={location.pathname === "/" ? classes.appBarHome : classes.appBar}
+      >
         <Toolbar>
           <DrawerButton />
           <Title />
